@@ -74,7 +74,7 @@ class array2regex
 		
 		if ($this->enclose_regex) $this->regex = '(?:' . $this->regex . ')';
 		
-		/// Make more efficient: change (?:.)? to .?
+		/// Make more efficient: change (?:x)? to x? (where "x" is any character).
 		$this->regex = preg_replace('/\(\?\:(\\\\?.)\)\?/', '\1?', $this->regex);
 		
 		return $this->regex;
@@ -85,52 +85,46 @@ class array2regex
 		if (!$after_loop) {
 			if ($last > 0) {
 				if ($i > $last) {
-					///NOTE: Found a match and the match contians more characters than before.
+					///NOTE: Found a match and the match contains more characters than before.
 					/// Example: sing vs sundery THEN sundery vs sung
 					if ($this->debugging) echo "<div>HERE4: $word1, $last $i ~ <u>{$this->regex}</u> ~ ". substr($word1, $last, $i - $last) . "</div>";
 					if ($this->add_alternative()) $this->regex .= "|";
-					//$this->regex .= substr($word1, $last, $i - $last);
 					$this->add_characters($word1, $last, $i - $last);
 					$this->regex .= '(?:';
-					//$this->regex .= substr($word1, $i);
 					$this->add_characters($word1, $i);
 					$this->parens_arr[] = array('pos' => $i, 'optional' => false);
 				} else {
-					///NOTE: Found a match but the match is the same or less characters than previously.
+					///NOTE: Found a match, but the match is the same or less characters than previously.
 					/// Example: sang vs sing THEN sing vs sung
 					/// Example: singing vs single THEN single vs sung
 					if ($i < $last && $i > 0) {
-						/// Insert new group, if there isn't one.
+						/// Insert a new group if there isn't one.
 						$this->insert_parens($i);
 					}
 					if ($this->debugging) echo "<div>HERE3: $word1, $last $i ~ <u>{$this->regex}</u> ~ ". substr($word1, $last) . "</div>";
 					if ($this->add_alternative()) $this->regex .= "|";
-					//$this->regex .= substr($word1, $last);
 					$this->add_characters($word1, $last);
 					$this->regex .= $this->close_parens($i);
 					if ($i == 0) $this->enclose_regex = true;
 				}
 			} else {
-				/// This only occurs when the last loop found no matches (or its the first run)
-				///TODO Can this be merged with the above?
+				/// This only occurs when the last loop found no matches (or it's the first run)
+				///TODO: Determine if this can be merged with the above.
 				$this->regex .= $this->close_parens($i);
 				if ($i == 0) {
 					///NOTE: No matching characters found.
 					/// Example: man vs sang
 					if ($this->debugging) echo "<div>HERE0: $word1, $last $i ~ <u>{$this->regex}</u> ~ $word1  </div>";
 					if ($this->add_alternative()) $this->regex .= "|";
-					//$this->regex .= $word1;
 					$this->add_characters($word1, 0);
 					$this->enclose_regex = true;
 				} else {
-					///NOTE: The first time to find atleast one charater to match for a letter.
-					/// Example: sang vs sing
+					///NOTE: The first time to find at least one charater to match for a letter.
+					/// Example: sang vs sing NOT sing vs ring
 					if ($this->debugging) echo "<div>HERE1: $word1, $last $i - $last ~ <u>{$this->regex}</u> ~ ". substr($word1, $last, $i - $last) . "</div>";
 					if ($this->add_alternative()) $this->regex .= "|";
-					//$this->regex .= substr($word1, $last, $i - $last);
 					$this->add_characters($word1, $last, $i - $last);
 					$this->regex .= '(?:';
-					//$this->regex .= substr($word1, $i - $last);
 					$this->add_characters($word1, $i - $last);
 					$this->parens_arr[] = array('pos' => $i, 'optional' => false);
 				}
@@ -141,7 +135,6 @@ class array2regex
 			/// Example: sing vs singing
 			if ($this->debugging) echo "<div>HERE2: $word1, $last $i ~ <u>{$this->regex}</u> ~ ". substr($word1, $last) . "</div>";
 			if ($this->add_alternative()) $this->regex .= "|";
-			//$this->regex .= substr($word1, $last);
 			$this->add_characters($word1, $last);
 				
 			$this->regex .= $this->close_parens($i);
@@ -171,7 +164,7 @@ class array2regex
 			}
 		}
 		
-		/// Reorder array to prevent gaps again.
+		/// Reorder array to prevent gaps, again.
 		$this->parens_arr = array_values($this->parens_arr);
 		
 		return $str;
@@ -212,7 +205,7 @@ class array2regex
 		foreach ($this->parens_arr as $value) {
 			if ($value['pos'] == $pos) return false;
 		}
-		//echo "<div>insert_parens $pos</div>";
+		if ($this->debugging) echo "<div>insert_parens $pos</div>";
 		$this->regex = substr($this->regex, 0, $this->char_arr[$pos]) . '(?:' . substr($this->regex, $this->char_arr[$pos]);
 		$char_count = count($this->char_arr);
 		for ($i = $pos + 1; $i < $char_count; $i++) {
@@ -223,7 +216,6 @@ class array2regex
 		if ($this->debugging) {echo '1st parens '; print_r($this->parens_arr);echo '<br>';}
 		$found = false;
 		for ($i = $parens_count - 1; $i >= 0; $i--) {
-			//if ($this->parens_arr[$i]['pos'] > $pos + 1) {
 			if ($this->parens_arr[$i]['pos'] > $pos) {
 				$this->parens_arr[$i + 1] = array('pos' => $this->parens_arr[$i]['pos'], 'optional' => $this->parens_arr[$i]['optional']);
 			} else {
