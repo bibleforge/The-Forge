@@ -3,7 +3,7 @@
 error_reporting(E_ALL);
 set_time_limit(9999999);
 
-die('not needed');
+die('Are you sure?');
 // ********************
 // delcare variables
 // ********************
@@ -49,43 +49,11 @@ while ($row = mysql_fetch_assoc($res)) {
 		if (strpos($class_str, ' ') !== false) $class_str = "'$class_str'";
 		$str .= $class_str;
 	}
-	//if ($row['divine'] == 1) $row["word"] = ucfirst(strtolower($row["word"]));
 	$str .= " id={$row["id"]}>{$row["word"]}</a> ";
 }
 
 $query = "INSERT INTO $simple (id, book, chapter, verse, words) VALUES
-($vID, $b, $c, $v, '". addslashes(addslashes(substr($str, 0, -1))) ."')";
+		  ($vID, $b, $c, $v, '". addslashes(addslashes(substr($str, 0, -1))) ."')";
 mysql_query($query) or die(mysql_error() . "<br>". $query);
 
-/*
-
-$query = "SELECT verseID, book, chapter, verse, word FROM $table WHERE word != '' ORDER BY id";
-
-$res = mysql_query($query) or die(mysql_error() . "<br>". $query);
-$vID = 0;
-$b = 0;
-$c = 0;
-$v = 0;
-$str = "";
-while ($row = mysql_fetch_assoc($res)) {
-	if ($vID != $row['verseID']) {
-		if ($vID > 0) {
-			$query = "INSERT INTO $searchable (verseID, book, chapter, verse, words) VALUES
-			($vID, $b, $c, $v, '". addslashes(substr($str, 1)) ."')";
-			mysql_query($query) or die(mysql_error() . "<br>". $query);
-		}
-		$vID = $row['verseID'];
-		$b = $row['book'];
-		$c = $row['chapter'];
-		$v = $row['verse'];
-		$str = "";
-	}
-	$str .= " {$row["word"]}";
-}
-
-$query = "INSERT INTO $searchable (verseID, book, chapter, verse, words) VALUES
-($vID, $b, $c, $v, '". addslashes(substr($str, 1)) ."')";
-mysql_query($query) or die(mysql_error() . "<br>". $query);
-*/
-?>
-done
+echo 'done';
