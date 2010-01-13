@@ -49,6 +49,11 @@ foreach ($words as $query => $empty) {
 	}
 	$info = get_info($query);
 	$base_word = choose_common_form($info);
+	
+	if ($base_word == "") {
+		die("<b>Error: $query == blank?");
+	} 
+	
 	/// Recheck to see if the base word was added already.
 	if (get_hits($base_word) != 0) {
 		echo "Skipping $query<br>";
@@ -74,6 +79,7 @@ function get_info($word)
 	//$all_matches = array();
 	$cur_words = array();
 	do {
+		$loop_again = false;
 		$sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id (0 means no limit))
 		$sphinx_res = $sphinx->Query($word, 'verse_text');
 		
@@ -81,6 +87,7 @@ function get_info($word)
 		if (!is_array($sphinx_res)) {
 			echo "Mistake at line " . __line__ . " ($word)<br>";
 			@ob_flush();flush();
+			$loop_again = true;
 			sleep(2);
 			/// Try again.
 			continue;
@@ -95,7 +102,7 @@ function get_info($word)
 		
 		find_words_and_hits($cur_words, $text_arr, $word);
 		//$all_matches = array_merge($all_matches, $simple_matches);
-	} while (count($matches) == $upper_limit);
+	} while (count($matches) == $upper_limit || $loop_again);
 	//echo "<pre>";print_r($cur_words);die;
 	//echo '<pre>';print_r($sphinx_res);die;
 	return $cur_words;
@@ -107,17 +114,19 @@ function find_words_and_hits(&$cur_words, $text_arr, $word)
 	global $sphinx, $punc;
 	/// This is just a wrapper in case Sphinx messes up.
 	do {
+		$loop_again = false;
 		/// Set a high limit to make sure that all of the words are matched.
 		$exerpts = $sphinx->BuildExcerpts($text_arr, "verse_text", $word, array('limit' => 99999));
 		/// Did Sphinx mess up?
 		if (!is_array($exerpts)) {
 			echo "Mistake at line " . __line__ . " ($word)<br>";
 			@ob_flush();flush();
+			$loop_again = true;
 			sleep(2);
 			/// Try again.
 			continue;
 		}
-	} while (false);
+	} while (false || $loop_again);
 	
 	//echo "<pre>";print_r($exerpts);die;
 	foreach ($exerpts as $exerpt) {
