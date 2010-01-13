@@ -60,8 +60,6 @@ class array2regex
 				$last = $i;
 				$word1 = $word2;
 			}
-			
-	
 		}
 		
 		/// Check one last time.

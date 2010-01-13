@@ -71,6 +71,7 @@ $array_str = '
 $json_str = str_replace("\n","",$array_str);
 $arr = json_decode($json_str, true);
 
+/// Create the array containing all books to create a RegEx to find if a word is a reference at all.
 $arr_all = array();
 foreach ($arr as $value) {
 	$arr_all = array_merge($arr_all, $value);
