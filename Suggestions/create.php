@@ -3,8 +3,10 @@
 error_reporting(E_ALL);
 set_time_limit(9999999);
 
-$table = "bible_english";
-$table_suggest = "suggestions_english";
+$language = "english";
+
+$table = "bible_" . $language;
+$table_suggest = "suggestions_" . $language;
 
 $db = mysql_connect("localhost", "XXXXXXXXX", "XXXXXXXXXXXXXX");
 mysql_select_db("bf", $db);
@@ -69,7 +71,12 @@ foreach ($words as $query => $empty) {
 	@ob_flush();flush();
 }
 
+if (file_exists('manual_' . $language . '.php')) include 'manual_' . $language . '.php';
+
 die("<b>done!");
+
+
+
 
 function get_info($word)
 {
@@ -179,4 +186,45 @@ function choose_common_form($info)
 		}
 	}
 	return $first_word;
+}
+
+
+/*******************************
+ * Language specific functions *
+ *******************************/
+
+
+function change_words($change_words)
+{
+	global $table_suggest;
+	foreach ($change_words as $old => $new) {
+		if (get_hits($new) != 0) {
+			echo "Skipping $new<br>";
+			@ob_flush();flush();
+			continue;
+		}
+		$query = "UPDATE $table_suggest SET text = \"" . addslashes($new) . "\" WHERE text = \"" . addslashes($old) . "\"";
+		mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
+		echo "Changed $old to $new<br>";
+		@ob_flush();flush();
+	}
+}
+ 
+function add_proper_nouns($proper_nouns)
+{
+	global $table_suggest;
+	foreach ($proper_nouns as $common => $proper) {
+		if (get_hits($proper) != 0) {
+			echo "Skipping $proper<br>";
+			@ob_flush();flush();
+			continue;
+		}
+		$query = "SELECT hits FROM $table_suggest WHERE text = \"" . addslashes($common) . "\"";
+		$res = mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
+		$row = mysql_fetch_assoc($res);
+		$query = "INSERT INTO $table_suggest VALUES (\"" . addslashes($proper) . "\", {$row['hits']})";
+		mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
+		echo "Added proper noun $proper from $common: {$row['hits']}<br>";
+		@ob_flush();flush();
+	}
 }
