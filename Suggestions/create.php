@@ -42,15 +42,26 @@ while ($row = mysql_fetch_assoc($res)) {
 $i = 0;
 
 foreach ($words as $query => $empty) {
-	if (get_hits($query) != 0) continue;
+	if (get_hits($query) != 0) {
+		echo "Skipping $query<br>";
+		@ob_flush();flush();
+		continue;
+	}
 	$info = get_info($query);
 	$base_word = choose_common_form($info);
+	/// Recheck to see if the base word was added already.
+	if (get_hits($base_word) != 0) {
+		echo "Skipping $query<br>";
+		@ob_flush();flush();
+		continue;
+	}
 	$total = array_sum($info);
-	echo "$base_word: $total<br>";
-	@ob_flush();flush();
 	
 	$query = "INSERT INTO $table_suggest VALUES (\"" . addslashes($base_word) . "\", $total)";
 	mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
+	
+	echo "$base_word: $total<br>";
+	@ob_flush();flush();
 }
 
 die("<b>done!");
