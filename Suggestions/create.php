@@ -3,6 +3,13 @@
 error_reporting(E_ALL);
 set_time_limit(9999999);
 
+$min_word_len = 3;
+$min_phrase_len = 2;
+$do_phase1 = false;
+$do_phase2 = true;
+$give_feedback = true;
+$min_hits_to_continue = 11;
+
 $language = "english";
 
 $table = "bible_" . $language;
@@ -14,6 +21,7 @@ mysql_select_db("bf", $db);
 /// Uncomment for other languages.
 //mysql_query("SET NAMES utf8");
 
+$punc = array(",",".","?","!",";",":",")","(");
 
 /// Configure Sphinx
 require_once "../../dev/functions/sphinxapi.php";
@@ -28,49 +36,165 @@ $sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_addr
 $sphinx->SetLimits(0,$upper_limit);
 $sphinx->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
 
-$query = "SELECT DISTINCT word FROM $table WHERE word != ''";
-$res = mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
 
-$words = array();
-$punc = array(",",".","?","!",";",":",")","(");
-
-//$exerpts = $sphinx->BuildExcerpts(array('God created the heaven and the earth', 'Lets create stuff more more more more more more more more.'), "verse_text", "created", array());
-//echo "<pre>";print_r($exerpts);die;
-
-while ($row = mysql_fetch_assoc($res)) {
-	$words[str_replace($punc, "", $row['word'])] = "";
-}
-//echo "<pre>";print_r($words);
-$i = 0;
-
-foreach ($words as $query => $empty) {
-	if (get_hits($query) != 0) {
-		echo "Skipping $query<br>";
+/// Phase 1 (single words)
+if ($do_phase1) {
+	if ($give_feedback) {
+		echo "<b>Phase 1</b><br>";
 		@ob_flush();flush();
-		continue;
 	}
-	$info = get_info($query);
-	$base_word = choose_common_form($info);
+	$query = "SELECT DISTINCT word FROM $table WHERE word != ''";
+	$res = mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
 	
-	if ($base_word == "") {
-		die("<b>Error: $query == blank?");
-	} 
-	
-	/// Recheck to see if the base word was added already.
-	if (get_hits($base_word) != 0) {
-		echo "Skipping $query<br>";
-		@ob_flush();flush();
-		continue;
+	$words = array();
+	while ($row = mysql_fetch_assoc($res)) {
+		$words[str_replace($punc, "", $row['word'])] = "";
 	}
-	$total = array_sum($info);
+	//echo "<pre>";print_r($words);
 	
-	$query = "INSERT INTO $table_suggest VALUES (\"" . addslashes($base_word) . "\", $total)";
-	mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
-	
-	echo "$base_word: $total<br>";
-	@ob_flush();flush();
+	foreach ($words as $query => $empty) {
+		if (strlen($query) < $min_word_len || get_hits($query) != 0) {
+			if ($give_feedback) {
+				echo "Skipping $query<br>";
+				@ob_flush();flush();
+			}
+			continue;
+		}
+		
+		/// List all of the different forms of the word and how many times each occurs.
+		$info = get_info($query);
+		$base_word = choose_common_form($info);
+		
+		if ($base_word == "") {
+			die("<b>Error: $query == blank? (line: " . __LINE__ . ")");
+		}
+		
+		/// Recheck to see if the base word was added already.
+		if (strlen($base_word) < $min_word_len || get_hits($base_word) != 0) {
+			if ($give_feedback) {
+				echo "Skipping $query<br>";
+				@ob_flush();flush();
+			}
+			continue;
+		}
+		$total = array_sum($info);
+		
+		$query = "INSERT INTO $table_suggest VALUES (\"" . addslashes($base_word) . "\", $total)";
+		mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
+		
+		if ($give_feedback) {
+			echo "$base_word: $total<br>";
+			@ob_flush();flush();
+		}
+	}
 }
 
+/// Phase 2 (multiple words)
+if ($do_phase2) {
+	$sphinx->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
+	if ($give_feedback) {
+		echo "<b>Phase 2</b><br>";
+		@ob_flush();flush();
+	}
+	
+	/// First, gather all of the words so that we can create the phrases of different lengths.
+	
+	$query = "SELECT word, verse FROM $table WHERE word != ''";
+	$res = mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
+
+	$words = array();
+	$verses = array();
+	while ($row = mysql_fetch_assoc($res)) {
+		//$words[] = str_replace($punc, "", $row['word']);
+		$words[] = $row['word'];
+		$verses[] = $row['verse'];
+	}
+	
+	$word_count = count($words);
+	
+	for ($word_num = 0; $word_num < $word_count - $min_phrase_len + 1; ++$word_num) {
+		$phrase_length = $min_phrase_len - 1;
+		$end_of_entire_phrase = false;
+		
+		do {
+			++$phrase_length;
+			/// Create the phrase
+			$phrase = "";
+			$cur_verse = $verses[$word_num];
+			for ($j = 0; $j < $phrase_length; ++$j) {
+				/// The end has been found!
+				if (!isset($verses[$word_num + $j])) {
+					continue 2;
+				}
+				
+				/// Does the verse change?
+				if ($cur_verse != $verses[$word_num + $j]) {
+					continue 2;
+				}
+				
+				/// Does the phrase come to an end?
+				///TODO: Determine if other punctuation be looked for like parentheses.
+				if (strpos($words[$word_num + $j], ".") !== false || strpos($words[$word_num + $j], "?") !== false || strpos($words[$word_num + $j], "!") !== false) {
+					/// Is this the last word?
+					if ($j == $phrase_length -1) {
+						$end_of_entire_phrase = true;
+					} else {
+						/// This phrase is split.
+						continue 2;
+					}
+				}
+				$phrase .= str_replace($punc, "", $words[$word_num + $j]) . " ";
+			}
+			$phrase = trim($phrase);
+			
+			/*
+			if (get_hits($phrase) != 0) {
+				if ($give_feedback) {
+					echo "Skipping $phrase<br>";
+					@ob_flush();flush();
+				}
+				continue;
+			}
+			*/
+			/// We must get info about the phrase so that we know if we need to abandon the phrase because it is too rare.
+			$info = get_info('"' . $phrase . '"');
+			
+			$total = array_sum($info);
+			
+			/// The phrase is now quite rare, so no more suggestions are needed because the actual verse should be found.
+			if ($total < $min_hits_to_continue) {
+				$end_of_entire_phrase = true;
+			}
+			
+			$base_phrase = choose_common_form($info);
+			
+			if ($base_phrase == "") {
+				die("<b>Error: $phrase == blank? (line: " . __LINE__ . ")");
+			}
+			
+			/// Recheck to see if the base word was added already.
+			if (get_hits($base_phrase) != 0) {
+				if ($give_feedback) {
+					echo "Skipping $phrase<br>";
+					@ob_flush();flush();
+				}
+				continue;
+			}
+			
+			$query = "INSERT INTO $table_suggest VALUES (\"" . addslashes($base_phrase) . "\", $total)";
+			mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
+			
+			if ($give_feedback) {
+				echo "$base_phrase: $total<br>";
+				@ob_flush();flush();
+			}
+			
+		} while (!$end_of_entire_phrase);
+	}
+}
+
+
+/// If there are any manual commands, run them.
 if (file_exists('manual_' . $language . '.php')) include 'manual_' . $language . '.php';
 
 die("<b>done!");
@@ -123,7 +247,7 @@ function find_words_and_hits(&$cur_words, $text_arr, $word)
 	do {
 		$loop_again = false;
 		/// Set a high limit to make sure that all of the words are matched.
-		$exerpts = $sphinx->BuildExcerpts($text_arr, "verse_text", $word, array('limit' => 99999));
+		$exerpts = $sphinx->BuildExcerpts($text_arr, "verse_text", $word, array('limit' => 99999, 'exact_phrase' => true));
 		/// Did Sphinx mess up?
 		if (!is_array($exerpts)) {
 			echo "Mistake at line " . __line__ . " ($word)<br>";
@@ -135,7 +259,7 @@ function find_words_and_hits(&$cur_words, $text_arr, $word)
 		}
 	} while (false || $loop_again);
 	
-	//echo "<pre>";print_r($exerpts);die;
+	echo "<pre>";print_r($exerpts);//die;
 	foreach ($exerpts as $exerpt) {
 		$matches = array();
 		preg_match_all("/\<b\>([^<]+)\</", $exerpt, $matches);
@@ -185,6 +309,7 @@ function choose_common_form($info)
 			if ($word == strtolower($word)) return $word;
 		}
 	}
+	if (!isset($first_word)) return false;
 	return $first_word;
 }
 
