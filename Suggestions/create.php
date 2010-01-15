@@ -123,29 +123,27 @@ if ($do_phase2) {
 			/// Create the phrase
 			$phrase = "";
 			$cur_verse = $verses[$word_num];
+			
 			for ($j = 0; $j < $phrase_length; ++$j) {
 				/// The end has been found!
 				if (!isset($verses[$word_num + $j])) {
-					++$word_num;
-					continue 2;
+					continue 3;
 				}
 				
-				/// Does the verse change?
+				/// Does the verse change?  (only verses that don't end in a period, question mark, or exclemation point)
 				if ($cur_verse != $verses[$word_num + $j]) {
-					++$word_num;
-					continue 2;
+					continue 3;
 				}
 				
 				/// Does the phrase come to an end?
-				///TODO: Determine if other punctuation be looked for like parentheses.
+				///TODO: Determine if other punctuation be looked for like parentheses, semicolon.
 				if (strpos($words[$word_num + $j], ".") !== false || strpos($words[$word_num + $j], "?") !== false || strpos($words[$word_num + $j], "!") !== false) {
 					/// Is this the last word?
 					if ($j == $phrase_length -1) {
 						$end_of_entire_phrase = true;
 					} else {
 						/// This phrase is split.
-						++$word_num;
-						continue 2;
+						continue 3;
 					}
 				}
 				$phrase .= str_replace($punc, "", $words[$word_num + $j]) . " ";
