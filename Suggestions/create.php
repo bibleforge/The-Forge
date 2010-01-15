@@ -214,6 +214,7 @@ function get_info($word)
 	$start_id = 0;
 	//$all_matches = array();
 	$cur_words = array();
+	$matches = array();
 	do {
 		$loop_again = false;
 		$sphinx->SetIDRange($start_id, 99999999); /// SetIDRange(start_id, stop_id (0 means no limit))
