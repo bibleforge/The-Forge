@@ -152,15 +152,18 @@ if ($do_phase2) {
 			}
 			$phrase = trim($phrase);
 			
-			/*
-			if (get_hits($phrase) != 0) {
+			/// Check to see if we already got this phrase and if so, should we keep checking for a longer phrase?
+			if (($total = get_hits($phrase)) != 0) {
+				if ($total < $min_hits_to_continue) {
+					$end_of_entire_phrase = true;
+				}
 				if ($give_feedback) {
 					echo "Skipping $phrase<br>";
 					@ob_flush();flush();
 				}
 				continue;
 			}
-			*/
+			
 			/// We must get info about the phrase so that we know if we need to abandon the phrase because it is too rare.
 			$info = get_info('"' . $phrase . '"');
 			
