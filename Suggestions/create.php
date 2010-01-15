@@ -10,7 +10,9 @@ $do_phase2 = true;
 $give_feedback = true;
 $min_hits_to_continue = 11;
 
+
 $language = "english";
+$index = "verse_text";
 
 $table = "bible_" . $language;
 $table_suggest = "suggestions_" . $language;
@@ -36,6 +38,33 @@ $sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_addr
 $sphinx->SetLimits(0,$upper_limit);
 $sphinx->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
 
+
+$t = Array
+(
+    0 => "In the beginning God created the heaven and the earth.",
+    1 => "The heaven and the Thus the heavens and the earth were finished, and all the host of them.",
+    2 => "Behold, the heaven and the heaven of heavens is the LORD's thy God, the earth also, with all that therein is.",
+    3 => "And Absalom met the servants of David. And Absalom rode upon a mule, and the mule went under the thick boughs of a great oak, and his head caught hold of the oak, and he was taken up between the heaven and the earth; and the mule that was under him went away.",
+    4 => "The LORD also thundered in the heavens, and the Highest gave his voice; hail stones and coals of fire.",
+    5 => "Therefore I will shake the heavens, and the earth shall remove out of her place, in the wrath of the LORD of hosts, and in the day of his fierce anger.",
+    6 => "For the mountains will I take up a weeping and wailing, and for the habitations of the wilderness a lamentation, because they are burned up, so that none can pass through them; neither can men hear the voice of the cattle; both the fowl of the heavens and the beast are fled; they are gone.",
+    7 => "Thus shall ye say unto them, The gods that have not made the heavens and the earth, even they shall perish from the earth, and from under these heavens.",
+    8 => "And I will appoint over them four kinds, saith the LORD: the sword to slay, and the dogs to tear, and the fowls of the heaven, and the beasts of the earth, to devour and destroy.",
+    9 => "Ah Lord GOD! behold, thou hast made the heaven and the earth by thy great power and stretched out arm, and there is nothing too hard for thee:",
+    10 => "Then the heaven and the earth, and all that is therein, shall sing for Babylon: for the spoilers shall come unto her from the north, saith the LORD.",
+    11 => "So that the fishes of the sea, and the fowls of the heaven, and the beasts of the field, and all creeping things that creep upon the earth, and all the men that are upon the face of the earth, shall shake at my presence, and the mountains shall be thrown down, and the steep places shall fall, and every wall shall fall to the ground.",
+    12 => "The tree that thou sawest, which grew, and was strong, whose height reached unto the heaven, and the sight thereof to all the earth;",
+    13 => "The LORD also shall roar out of Zion, and utter his voice from Jerusalem; and the heavens and the earth shall shake: but the LORD will be the hope of his people, and the strength of the children of Israel.",
+    14 => "God came from Teman, and the Holy One from mount Paran. Selah. His glory covered the heavens, and the earth was full of his praise.",
+    15 => "I will consume man and beast; I will consume the fowls of the heaven, and the fishes of the sea, and the stumblingblocks with the wicked; and I will cut off man from off the land, saith the LORD.",
+    16 => "For thus saith the LORD of hosts; Yet once, it is a little while, and I will shake the heavens, and the earth, and the sea, and the dry land;",
+    17 => "Speak to Zerubbabel, governor of Judah, saying, I will shake the heavens and the earth;",
+    18 => "But the heavens and the earth, which are now, by the same word are kept in store, reserved unto fire against the day of judgment and perdition of ungodly men."
+);
+
+$exerpts = force_excerpts($t, $index, "the heaven and the");
+
+echo "<pre>";print_r($exerpts);die;
 
 /// Phase 1 (single words)
 if ($do_phase1) {
@@ -242,12 +271,12 @@ function get_info($word)
 
 function find_words_and_hits(&$cur_words, $text_arr, $word)
 {
-	global $sphinx, $punc;
+	global $sphinx, $punc, $index;
 	/// This is just a wrapper in case Sphinx messes up.
 	do {
 		$loop_again = false;
 		/// Set a high limit to make sure that all of the words are matched.
-		$exerpts = $sphinx->BuildExcerpts($text_arr, "verse_text", $word, array('limit' => 99999, 'exact_phrase' => true));
+		$exerpts = $sphinx->BuildExcerpts($text_arr, $index, $word, array('limit' => 99999, 'exact_phrase' => true));
 		/// Did Sphinx mess up?
 		if (!is_array($exerpts)) {
 			echo "Mistake at line " . __line__ . " ($word)<br>";
@@ -257,7 +286,7 @@ function find_words_and_hits(&$cur_words, $text_arr, $word)
 			/// Try again.
 			continue;
 		}
-	} while (false || $loop_again);
+	} while ($loop_again);
 	
 	echo "<pre>";print_r($exerpts);//die;
 	foreach ($exerpts as $exerpt) {
@@ -272,6 +301,8 @@ function find_words_and_hits(&$cur_words, $text_arr, $word)
 			}
 		}
 	}
+	
+	if (count($cur_words) == 0) $cur_words = force_excerpts($text_arr, $index, $word)
 }
 
 function get_text($in)
@@ -313,6 +344,97 @@ function choose_common_form($info)
 	return $first_word;
 }
 
+
+function force_excerpts($text_arr, $this_index, $phrase)
+{
+	global $sphinx, $punc;
+	
+	$words = explode(" ", $phrase);
+	$phrase_count = count($words);
+	$exerpt_matches = array();
+	$remove = array('<b>', '</b>');
+	foreach ($words as $phrase_word_num => $word) {
+		do {
+			$loop_again = false;
+			/// Set a high limit to make sure that all of the words are matched.
+			$exerpts = $sphinx->BuildExcerpts($text_arr, $this_index, $word, array('limit' => 99999, 'before_match' => '<b>', 'after_match' => '</b>'));
+			/// Did Sphinx mess up?
+			if (!is_array($exerpts)) {
+				echo "Mistake at line " . __line__ . " ($word)<br>";
+				@ob_flush();flush();
+				$loop_again = true;
+				sleep(2);
+				/// Try again.
+				continue;
+			}
+		} while ($loop_again);
+		
+		foreach ($exerpts as $exerpt_number => $exerpt) {
+			$exerpt_words = explode(" ", $exerpt);
+			foreach ($exerpt_words as $word_number => $exerpt_word) {
+				$exerpt_word = trim($exerpt_word);
+				if (substr($exerpt_word, 0, 3) == "<b>") {
+					$exerpt_matches[$exerpt_number][$word_number]['word'] = str_replace($remove, '', $exerpt_word);
+					$exerpt_matches[$exerpt_number][$word_number]['numbers'][$phrase_word_num] = "";
+					///FIXME: Do this just once, later.
+					uksort($exerpt_matches[$exerpt_number], 'correct_ksort');
+				}
+			}
+		}
+	}
+	
+	//echo "<pre>";print_r($exerpt_matches);die;
+	
+	/// Compare the individual matches to find the phrases.
+	
+	$excerpt_text = array();
+	foreach ($exerpt_matches as $exerpt_num => $exerpt_group) {
+		$last_word_num = -1;
+		$phrase = "";
+		$word_count = 0;
+		foreach ($exerpt_group as $word_num => $results) {
+			/// Is the next word found right next to the last word? (I.e., are they a phrase?)
+			/// And is this word the next in the phrase?
+			if ($last_word_num != -1 && $word_num == $last_word_num + 1 && isset($results['numbers'][$word_count])) {
+				$phrase .= " ". $results['word'];
+				++$word_count;
+				$last_word_num = $word_num;
+				/// Did we find the last word in the phrase?
+				if ($word_count == $phrase_count) {
+					/// This creates a fake highlighted results. (not used currently)
+					//if (!isset($excerpt_text[$exerpt_num])) $excerpt_text[$exerpt_num] = "";
+					//$excerpt_text[$exerpt_num] .= " <b>" . trim($phrase) . "</b>";
+					
+					$value = str_replace($punc, "", $phrase);
+					if (isset($excerpt_text[$value])) {
+						++$excerpt_text[$value];
+					} else {
+						$excerpt_text[$value] = 1;
+					}
+				}
+			} else {
+				/// Reset
+				$last_word_num = -1;
+				$phrase = "";
+				$word_count = 0;
+				
+				/// Look for the start of the phrase
+				if ($last_word_num == -1 && isset($results['numbers'][$word_count])) {
+					$last_word_num = $word_num;
+					$phrase = $results['word'];
+					++$word_count;
+				}
+			}
+		}
+	}
+	echo "<pre>";print_r($excerpt_text);die;
+	return $excerpt_text;
+}
+
+
+function correct_ksort($a, $b) {
+	return $a - $b;
+}
 
 /*******************************
  * Language specific functions *
