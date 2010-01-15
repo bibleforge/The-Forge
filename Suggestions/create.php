@@ -95,7 +95,7 @@ if ($do_phase1) {
 if ($do_phase2) {
 	$sphinx->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
 	if ($give_feedback) {
-		echo "<b>Phase 2</b><br>";
+		echo "<div><b>Phase 2</b></div>";
 		@ob_flush();flush();
 	}
 	
@@ -126,11 +126,13 @@ if ($do_phase2) {
 			for ($j = 0; $j < $phrase_length; ++$j) {
 				/// The end has been found!
 				if (!isset($verses[$word_num + $j])) {
+					++$word_num;
 					continue 2;
 				}
 				
 				/// Does the verse change?
 				if ($cur_verse != $verses[$word_num + $j]) {
+					++$word_num;
 					continue 2;
 				}
 				
@@ -142,6 +144,7 @@ if ($do_phase2) {
 						$end_of_entire_phrase = true;
 					} else {
 						/// This phrase is split.
+						++$word_num;
 						continue 2;
 					}
 				}
@@ -404,7 +407,7 @@ function force_excerpts($text_arr, $this_index, $phrase, &$cur_words)
 			}
 		}
 	}
-	//echo "<pre>";print_r($excerpt_text);die;
+	//echo "<pre>";print_r($cur_words);//die;
 	//return $excerpt_text;
 }
 
