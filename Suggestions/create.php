@@ -39,33 +39,6 @@ $sphinx->SetLimits(0,$upper_limit);
 $sphinx->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
 
 
-$t = Array
-(
-    0 => "In the beginning God created the heaven and the earth.",
-    1 => "The heaven and the Thus the heavens and the earth were finished, and all the host of them.",
-    2 => "Behold, the heaven and the heaven of heavens is the LORD's thy God, the earth also, with all that therein is.",
-    3 => "And Absalom met the servants of David. And Absalom rode upon a mule, and the mule went under the thick boughs of a great oak, and his head caught hold of the oak, and he was taken up between the heaven and the earth; and the mule that was under him went away.",
-    4 => "The LORD also thundered in the heavens, and the Highest gave his voice; hail stones and coals of fire.",
-    5 => "Therefore I will shake the heavens, and the earth shall remove out of her place, in the wrath of the LORD of hosts, and in the day of his fierce anger.",
-    6 => "For the mountains will I take up a weeping and wailing, and for the habitations of the wilderness a lamentation, because they are burned up, so that none can pass through them; neither can men hear the voice of the cattle; both the fowl of the heavens and the beast are fled; they are gone.",
-    7 => "Thus shall ye say unto them, The gods that have not made the heavens and the earth, even they shall perish from the earth, and from under these heavens.",
-    8 => "And I will appoint over them four kinds, saith the LORD: the sword to slay, and the dogs to tear, and the fowls of the heaven, and the beasts of the earth, to devour and destroy.",
-    9 => "Ah Lord GOD! behold, thou hast made the heaven and the earth by thy great power and stretched out arm, and there is nothing too hard for thee:",
-    10 => "Then the heaven and the earth, and all that is therein, shall sing for Babylon: for the spoilers shall come unto her from the north, saith the LORD.",
-    11 => "So that the fishes of the sea, and the fowls of the heaven, and the beasts of the field, and all creeping things that creep upon the earth, and all the men that are upon the face of the earth, shall shake at my presence, and the mountains shall be thrown down, and the steep places shall fall, and every wall shall fall to the ground.",
-    12 => "The tree that thou sawest, which grew, and was strong, whose height reached unto the heaven, and the sight thereof to all the earth;",
-    13 => "The LORD also shall roar out of Zion, and utter his voice from Jerusalem; and the heavens and the earth shall shake: but the LORD will be the hope of his people, and the strength of the children of Israel.",
-    14 => "God came from Teman, and the Holy One from mount Paran. Selah. His glory covered the heavens, and the earth was full of his praise.",
-    15 => "I will consume man and beast; I will consume the fowls of the heaven, and the fishes of the sea, and the stumblingblocks with the wicked; and I will cut off man from off the land, saith the LORD.",
-    16 => "For thus saith the LORD of hosts; Yet once, it is a little while, and I will shake the heavens, and the earth, and the sea, and the dry land;",
-    17 => "Speak to Zerubbabel, governor of Judah, saying, I will shake the heavens and the earth;",
-    18 => "But the heavens and the earth, which are now, by the same word are kept in store, reserved unto fire against the day of judgment and perdition of ungodly men."
-);
-
-$exerpts = force_excerpts($t, $index, "the heaven and the");
-
-echo "<pre>";print_r($exerpts);die;
-
 /// Phase 1 (single words)
 if ($do_phase1) {
 	if ($give_feedback) {
@@ -288,7 +261,9 @@ function find_words_and_hits(&$cur_words, $text_arr, $word)
 		}
 	} while ($loop_again);
 	
-	echo "<pre>";print_r($exerpts);//die;
+	//echo "<pre>";print_r($exerpts);//die;
+	
+	$found_matches = false;
 	foreach ($exerpts as $exerpt) {
 		$matches = array();
 		preg_match_all("/\<b\>([^<]+)\</", $exerpt, $matches);
@@ -298,11 +273,13 @@ function find_words_and_hits(&$cur_words, $text_arr, $word)
 				++$cur_words[$value];
 			} else {
 				$cur_words[$value] = 1;
+				$found_matches = true;
 			}
 		}
 	}
 	
-	if (count($cur_words) == 0) $cur_words = force_excerpts($text_arr, $index, $word)
+	/// A workaround for the Sphinx bug where no matches are found for long phrases.
+	if (!$found_matches) force_excerpts($text_arr, $index, $word, $cur_words);
 }
 
 function get_text($in)
@@ -345,7 +322,7 @@ function choose_common_form($info)
 }
 
 
-function force_excerpts($text_arr, $this_index, $phrase)
+function force_excerpts($text_arr, $this_index, $phrase, &$cur_words)
 {
 	global $sphinx, $punc;
 	
@@ -406,10 +383,10 @@ function force_excerpts($text_arr, $this_index, $phrase)
 					//$excerpt_text[$exerpt_num] .= " <b>" . trim($phrase) . "</b>";
 					
 					$value = str_replace($punc, "", $phrase);
-					if (isset($excerpt_text[$value])) {
-						++$excerpt_text[$value];
+					if (isset($cur_words[$value])) {
+						++$cur_words[$value];
 					} else {
-						$excerpt_text[$value] = 1;
+						$cur_words[$value] = 1;
 					}
 				}
 			} else {
@@ -427,8 +404,8 @@ function force_excerpts($text_arr, $this_index, $phrase)
 			}
 		}
 	}
-	echo "<pre>";print_r($excerpt_text);die;
-	return $excerpt_text;
+	//echo "<pre>";print_r($excerpt_text);die;
+	//return $excerpt_text;
 }
 
 
