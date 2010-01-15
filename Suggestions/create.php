@@ -10,6 +10,9 @@ $do_phase2 = true;
 $give_feedback = true;
 $min_hits_to_continue = 11;
 
+$phase2_start_at_verse = 2030013;
+
+$upper_limit = 1000;
 
 $language = "english";
 $index = "verse_text";
@@ -30,7 +33,6 @@ require_once "../../dev/functions/sphinxapi.php";
 
 define('SPHINX_SERVER', '127.0.0.1');
 define('SPHINX_PORT', 9312);
-$upper_limit = 1000;
 
 $sphinx = new SphinxClient();
 $sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_address, sphinx_server_port)
@@ -102,6 +104,13 @@ if ($do_phase2) {
 	/// First, gather all of the words so that we can create the phrases of different lengths.
 	
 	$query = "SELECT word, verse FROM $table WHERE word != ''";
+	if (isset($phase2_start_at_verse) && $phase2_start_at_verse > 1) {
+		if ($give_feedback) {
+			echo "<div>Starting at <b>$phase2_start_at_verse</b></div>";
+			@ob_flush();flush();
+		}	
+		$query .= " AND verseID >= $phase2_start_at_verse"; 
+	}
 	$res = mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
 
 	$words = array();
@@ -230,6 +239,7 @@ function get_info($word)
 			/// Try again.
 			continue;
 		}
+		//echo '<pre>';print_r($sphinx_res);//die;
 		
 		$matches = array_keys($sphinx_res['matches']);
 		if (count($matches) == 0) break;
@@ -242,7 +252,6 @@ function get_info($word)
 		//$all_matches = array_merge($all_matches, $simple_matches);
 	} while (count($matches) == $upper_limit || $loop_again);
 	//echo "<pre>";print_r($cur_words);die;
-	//echo '<pre>';print_r($sphinx_res);die;
 	return $cur_words;
 }
 
@@ -266,6 +275,7 @@ function find_words_and_hits(&$cur_words, $text_arr, $word)
 		}
 	} while ($loop_again);
 	
+	/// Debug to find out which verses were found and see the highlights, if any.
 	//echo "<pre>";print_r($exerpts);//die;
 	
 	$found_matches = false;
@@ -351,11 +361,13 @@ function force_excerpts($text_arr, $this_index, $phrase, &$cur_words)
 			}
 		} while ($loop_again);
 		
+		//echo "<pre>";print_r($exerpts);//die;
+		
 		foreach ($exerpts as $exerpt_number => $exerpt) {
 			$exerpt_words = explode(" ", $exerpt);
 			foreach ($exerpt_words as $word_number => $exerpt_word) {
 				$exerpt_word = trim($exerpt_word);
-				if (substr($exerpt_word, 0, 3) == "<b>") {
+				if (strpos($exerpt_word, "<b>") !== false) {
 					$exerpt_matches[$exerpt_number][$word_number]['word'] = str_replace($remove, '', $exerpt_word);
 					$exerpt_matches[$exerpt_number][$word_number]['numbers'][$phrase_word_num] = "";
 					///FIXME: Do this just once, later.
@@ -365,7 +377,7 @@ function force_excerpts($text_arr, $this_index, $phrase, &$cur_words)
 		}
 	}
 	
-	//echo "<pre>";print_r($exerpt_matches);die;
+	//echo "<pre>";print_r($exerpt_matches);//die;
 	
 	/// Compare the individual matches to find the phrases.
 	
