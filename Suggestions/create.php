@@ -10,7 +10,7 @@ $do_phase2 = true;
 $give_feedback = true;
 $min_hits_to_continue = 11;
 
-$phase2_start_at_verse = 2030013;
+$phase2_start_at_verse = 3027027;
 
 $upper_limit = 1000;
 
@@ -40,7 +40,12 @@ $sphinx->SetServer(SPHINX_SERVER, SPHINX_PORT); /// SetServer(sphinx_server_addr
 $sphinx->SetLimits(0,$upper_limit);
 $sphinx->SetRankingMode(SPH_RANK_NONE); /// No ranking, fastest
 
+/// This is needed for single words because it breaks hyphenated words (currently).
+$sphinx->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
 
+$sphinx->SetConnectTimeout(5);
+
+		
 /// Phase 1 (single words)
 if ($do_phase1) {
 	if ($give_feedback) {
@@ -95,7 +100,6 @@ if ($do_phase1) {
 
 /// Phase 2 (multiple words)
 if ($do_phase2) {
-	$sphinx->SetMatchMode(SPH_MATCH_EXTENDED); /// Most complex (and slowest?).
 	if ($give_feedback) {
 		echo "<div><b>Phase 2</b></div>";
 		@ob_flush();flush();
@@ -240,7 +244,7 @@ function get_info($word)
 			continue;
 		}
 		//echo '<pre>';print_r($sphinx_res);//die;
-		
+		if (!isset($sphinx_res['matches'])) break; /// No results found (e.g., if there were exactly 1000 words found last time)
 		$matches = array_keys($sphinx_res['matches']);
 		if (count($matches) == 0) break;
 		$matches_string = implode(',', $matches);
@@ -249,6 +253,8 @@ function get_info($word)
 		$text_arr = get_text($matches_string);
 		
 		find_words_and_hits($cur_words, $text_arr, $word);
+		//echo '<pre>';print_r($cur_words);//die;
+		
 		//$all_matches = array_merge($all_matches, $simple_matches);
 	} while (count($matches) == $upper_limit || $loop_again);
 	//echo "<pre>";print_r($cur_words);die;
@@ -364,6 +370,9 @@ function force_excerpts($text_arr, $this_index, $phrase, &$cur_words)
 		//echo "<pre>";print_r($exerpts);//die;
 		
 		foreach ($exerpts as $exerpt_number => $exerpt) {
+			/// Convert a broken hyphenated word into one match.
+			$exerpt = str_replace('</b>-<b>', '-', $exerpt);
+			//echo "$exerpt<br>";
 			$exerpt_words = explode(" ", $exerpt);
 			foreach ($exerpt_words as $word_number => $exerpt_word) {
 				$exerpt_word = trim($exerpt_word);
@@ -376,7 +385,6 @@ function force_excerpts($text_arr, $this_index, $phrase, &$cur_words)
 			}
 		}
 	}
-	
 	//echo "<pre>";print_r($exerpt_matches);//die;
 	
 	/// Compare the individual matches to find the phrases.
@@ -389,7 +397,7 @@ function force_excerpts($text_arr, $this_index, $phrase, &$cur_words)
 		foreach ($exerpt_group as $word_num => $results) {
 			/// Is the next word found right next to the last word? (I.e., are they a phrase?)
 			/// And is this word the next in the phrase?
-			if ($last_word_num != -1 && $word_num == $last_word_num + 1 && isset($results['numbers'][$word_count])) {
+			if (($last_word_num != -1 && $word_num == $last_word_num + 1 || $phrase_count == 1) && isset($results['numbers'][$word_count])) {
 				$phrase .= " ". $results['word'];
 				++$word_count;
 				$last_word_num = $word_num;
@@ -399,7 +407,7 @@ function force_excerpts($text_arr, $this_index, $phrase, &$cur_words)
 					//if (!isset($excerpt_text[$exerpt_num])) $excerpt_text[$exerpt_num] = "";
 					//$excerpt_text[$exerpt_num] .= " <b>" . trim($phrase) . "</b>";
 					
-					$value = str_replace($punc, "", $phrase);
+					$value = trim(str_replace($punc, "", $phrase));
 					if (isset($cur_words[$value])) {
 						++$cur_words[$value];
 					} else {
