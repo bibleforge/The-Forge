@@ -71,7 +71,8 @@ if ($do_phase1) {
 		}
 		
 		/// List all of the different forms of the word and how many times each occurs.
-		$info = get_info($query);
+		///NOTE: The quotes are to keep hyphenated words together.
+		$info = get_info('"'. $query . '"');
 		$base_word = choose_common_form($info);
 		
 		if ($base_word == "") {
