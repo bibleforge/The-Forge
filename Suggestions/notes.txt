@@ -13,3 +13,6 @@ What about divine words?
 
 Two word phrases should be removed if just the first word is unique.
 	E.g., "Jehozabad" has 4 results and "Jehozabad the" has 1.  "Jehozabad the" is not needed.
+	Should we get rid of the single word phase?
+
+The last word in the English Bible is a complete sentence, so we don't know if the phrase script would correctly get phrases at the end for other languages.

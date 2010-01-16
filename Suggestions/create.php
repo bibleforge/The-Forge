@@ -2,11 +2,13 @@
 
 error_reporting(E_ALL);
 set_time_limit(9999999);
+ini_set("memory_limit","600M");
 
 $min_word_len = 3;
 $min_phrase_len = 2;
 $do_phase1 = false;
-$do_phase2 = true;
+$do_phase2 = false;
+$do_phase2_fix = true;
 $give_feedback = true;
 $min_hits_to_continue = 11;
 
@@ -210,6 +212,76 @@ if ($do_phase2) {
 			}
 			
 		} while (!$end_of_entire_phrase);
+	}
+}
+
+
+if ($do_phase2_fix) {
+	/// Fix phase 2 (rare two word phrases)
+
+	if ($give_feedback) {
+		echo "<div><b>Fix Phase 2</b></div>";
+		@ob_flush();flush();
+	}
+
+	$query = "SELECT text FROM `$table_suggest` WHERE hits < $min_hits_to_continue AND length(text) - length(replace(text, ' ', '')) = 1";
+	$res = mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
+	
+	while ($row = mysql_fetch_assoc($res)) {
+		$phrase = $row['text'];
+		$first_word = substr($phrase, 0, strpos($phrase, ' '));
+		
+		if (strlen($first_word) < $min_word_len) {
+			if ($give_feedback) {
+				echo "Skipping $phrase<br>";
+				@ob_flush();flush();
+			}
+			continue;
+		}
+		//$delete_it = false;
+		//die ($first_word);
+		
+		/// Is the sigle word rare?
+		///NOTE: If the result is 0 that means that the word was not found, so we need to find the base form.
+		$hits = get_hits($first_word);
+		if ($hits >= $min_hits_to_continue) {
+			$delete_it = false;
+		} elseif ($hits < $min_hits_to_continue && $hits != 0) {
+			$delete_it = true;
+		} else {
+			$info = get_info('"'. $first_word . '"');
+			$base_word = choose_common_form($info);
+			
+			if (strlen($base_word) < $min_word_len) {
+				if ($give_feedback) {
+					echo "Skipping $phrase<br>";
+					@ob_flush();flush();
+				}
+				continue;
+			}
+			
+			$hits = get_hits($base_word);
+			if ($hits == 0) {
+				//die ("Could not find the following: $first_word or $base_word from \"$phrase\"");
+				echo "Could not find the following: $first_word or $base_word from \"$phrase\"<br>";
+			} elseif ($hits < $min_hits_to_continue) {
+				$delete_it = true;
+			}
+		}
+		
+		if ($delete_it) {
+			if ($give_feedback) {
+				echo "Deleting $phrase<br>";
+				@ob_flush();flush();
+			}
+			$query = "DELETE FROM $table_suggest WHERE text = \"" . addslashes($phrase) . "\"";
+			mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);		
+		} else {
+			if ($give_feedback) {
+				echo "Skipping $phrase<br>";
+				@ob_flush();flush();
+			}
+		}
 	}
 }
 
