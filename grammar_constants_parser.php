@@ -82,7 +82,7 @@ foreach ($data as $key => $category) {
 	//$php_str .= "define('" . addslashes($cat_const) . "', " . (int)$key . ");\n";
 	$php_str .= "case " . (int)$key . ":\n\t\$attr = '" . addslashes(strtolower($cat_const)) . "';\n\tbreak;\n";
 	foreach ($category[$cat_const] as $subcat_num => $subcat_const) {
-		$js_str .= "'" . addslashes($subcat_const) . "':'[" . (int)$key . "," . (int)$subcat_num . "]',"; 
+		$js_str .= $subcat_const . ': "[' . (int)$key . ',' . (int)$subcat_num . ']", '; 
 	}
 }
 
@@ -102,4 +102,4 @@ echo " ****************/\n";
 echo "\n";
 
 echo $comment;
-echo 'var morph_grammar = {' . substr($js_str, 0, -1) . '};';
+echo 'morph_grammar:		{' . substr($js_str, 0, -2) . '},';
