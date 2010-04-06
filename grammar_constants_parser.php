@@ -102,4 +102,4 @@ echo " ****************/\n";
 echo "\n";
 
 echo $comment;
-echo 'morph_grammar:		{' . substr($js_str, 0, -2) . '},';
+echo 'grammar_keywords:	{' . substr($js_str, 0, -2) . '},';
