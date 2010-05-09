@@ -11,7 +11,6 @@ $table      = "bible_english";
 $searchable = 'bible_english_verses';
 $simple     = 'bible_english_html';
 
-$new        = "bible_english_new";
 
 $db = mysql_connect("localhost", "XXXXXXXXX", "XXXXXXXXXXXXXX");
 mysql_select_db("bf", $db);
@@ -67,16 +66,13 @@ while ($row = mysql_fetch_assoc($res)) {
 		if (strpos($class_str, ' ') !== false) $class_str = "'$class_str'";
 		$str .= $class_str;
 	}
-	if ($row['divine'] == 1) $row["word"] = ucfirst(strtolower($row["word"]));
 	$str  .= " id={$row["id"]}>{$row["word"]}</a> ";
 	$str2 .= "{$row["word"]} ";
-	
-	mysql_query("UPDATE $new SET word = \"" . addslashes($row["word"]) . "\" WHERE id = {$row['id']}");
 }
 
 $query  .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str,  0, -1))) ."')";
 $query2 .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str2, 0, -1))) ."')";
-//mysql_query($query) or die(mysql_error() . "<br>". $query);
+
 mysql_query($sql_intro1 . $query)  or die(__LINE__ . "<br>" . mysql_error() . "<br>". $sql_intro1 . $query);
 mysql_query($sql_intro2 . $query2) or die(__LINE__ . "<br>" . mysql_error() . "<br>". $sql_intro2 . $query2);
 
