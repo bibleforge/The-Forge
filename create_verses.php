@@ -8,8 +8,8 @@ set_time_limit(9999999);
  * delcare variables *
  *********************/
 $table      = "bible_english";
+$html_verses     = 'bible_english_html';
 $searchable = 'bible_english_verses';
-$simple     = 'bible_english_html';
 
 
 $db = mysql_connect("localhost", "XXXXXXXXX", "XXXXXXXXXXXXXX");
@@ -18,7 +18,7 @@ mysql_select_db("bf", $db);
 mysql_query("SET NAMES utf8");
 
 
-$query  = "SELECT id, verseID, book, chapter, verse, word, divine, red, implied FROM $table WHERE word != '' ORDER BY id";
+$query  = "SELECT id, verseID, book, chapter, verse, word, divine, red, implied, paragraph FROM $table ORDER BY id";
 
 $res    = mysql_query($query) or die(mysql_error() . "<br>" . $query);
 $vID    = 0;
@@ -31,13 +31,13 @@ $query  = "";
 $query2 = "";
 
 
-$sql_intro1 = "INSERT INTO $simple     (id, book, chapter, verse, words) VALUES ";
-$sql_intro2 = "INSERT INTO $searchable (id, book, chapter, verse, words) VALUES ";
+$sql_intro1 = "INSERT INTO $html_verses (id, book, chapter, verse, words, paragraph) VALUES ";
+$sql_intro2 = "INSERT INTO $searchable  (id, book, chapter, verse, words)            VALUES ";
 
 while ($row = mysql_fetch_assoc($res)) {
 	if ($vID != $row['verseID']) {
 		if ($vID > 0) {
-			$query  .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str,  0, -1))) ."'),";
+			$query  .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str,  0, -1))) ."', $para),";
 			$query2 .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str2, 0, -1))) ."'),";
 			
 			if (strlen($query) > 700000) {
@@ -51,9 +51,13 @@ while ($row = mysql_fetch_assoc($res)) {
 		$b    = $row['book'];
 		$c    = $row['chapter'];
 		$v    = $row['verse'];
+		$para = $row['paragraph'];
 		$str  = "";
 		$str2 = "";
 	}
+	
+	if ($row['word'] == '') continue;
+	
 	$str .= "<a";
 	if ($row['divine'] == 1 || $row['red'] == 1 || $row['implied'] == 1) {
 		$class_str  = '';
@@ -66,11 +70,11 @@ while ($row = mysql_fetch_assoc($res)) {
 		if (strpos($class_str, ' ') !== false) $class_str = "'$class_str'";
 		$str .= $class_str;
 	}
-	$str  .= " id={$row["id"]}>{$row["word"]}</a> ";
+	$str  .= " id={$row["id"]}>" . str_replace("'", '’', $row["word"]) . '</a> ';
 	$str2 .= "{$row["word"]} ";
 }
 
-$query  .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str,  0, -1))) ."')";
+$query  .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str,  0, -1))) ."', $para)";
 $query2 .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str2, 0, -1))) ."')";
 
 mysql_query($sql_intro1 . $query)  or die(__LINE__ . "<br>" . mysql_error() . "<br>". $sql_intro1 . $query);
