@@ -3,19 +3,20 @@
 error_reporting(E_ALL);
 set_time_limit(9999999);
 
-//die('Are you sure?');
+die('Are you sure?');
 /*********************
  * delcare variables *
  *********************/
-$table      = "bible_english";
-$html_verses     = 'bible_english_html';
-$searchable = 'bible_english_verses';
+$table       = "bible_english";
+$html_verses = 'bible_english_html';
+$searchable  = 'bible_english_verses';
 
 
 $db = mysql_connect("localhost", "XXXXXXXXX", "XXXXXXXXXXXXXX");
 mysql_select_db("bf", $db);
 
-mysql_query("SET NAMES utf8");
+/// Not needed for English version.
+//mysql_query("SET NAMES utf8");
 
 
 $query  = "SELECT id, verseID, book, chapter, verse, word, divine, red, implied, paragraph FROM $table ORDER BY id";
@@ -56,7 +57,7 @@ while ($row = mysql_fetch_assoc($res)) {
 		$str2 = "";
 	}
 	
-	if ($row['word'] == '') continue;
+	if ($row['word'] === '') continue;
 	
 	$str .= "<a";
 	if ($row['divine'] == 1 || $row['red'] == 1 || $row['implied'] == 1) {
@@ -70,7 +71,7 @@ while ($row = mysql_fetch_assoc($res)) {
 		if (strpos($class_str, ' ') !== false) $class_str = "'$class_str'";
 		$str .= $class_str;
 	}
-	$str  .= " id={$row["id"]}>" . str_replace("'", '’', $row["word"]) . '</a> ';
+	$str  .= " id={$row["id"]}>" . str_replace("'", '&#x2019;', $row["word"]) . '</a> ';
 	$str2 .= "{$row["word"]} ";
 }
 
