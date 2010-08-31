@@ -71,7 +71,8 @@ while ($row = mysql_fetch_assoc($res)) {
 		if (strpos($class_str, ' ') !== false) $class_str = "'$class_str'";
 		$str .= $class_str;
 	}
-	$str  .= " id={$row["id"]}>" . str_replace("'", '&#x2019;', $row["word"]) . '</a> ';
+	//$str  .= " id={$row["id"]}>" . str_replace("'", '’', $row["word"]) . '</a> ';
+	$str  .= " id={$row["id"]}>" . $row["word"] . '</a> ';
 	$str2 .= "{$row["word"]} ";
 }
 
