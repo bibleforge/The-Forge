@@ -38,8 +38,8 @@ $sql_intro2 = "INSERT INTO $searchable  (id, book, chapter, verse, words)       
 while ($row = mysql_fetch_assoc($res)) {
 	if ($vID != $row['verseID']) {
 		if ($vID > 0) {
-			$query  .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str,  0, -1))) ."', $para),";
-			$query2 .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str2, 0, -1))) ."'),";
+			$query  .= "($vID, $b, $c, $v, '". addslashes(substr($str,  0, -1)) ."', $para),";
+			$query2 .= "($vID, $b, $c, $v, '". addslashes(substr($str2, 0, -1)) ."'),";
 			
 			if (strlen($query) > 700000) {
 				mysql_query($sql_intro1 . substr($query,  0, -1)) or die(__LINE__ . "<br>" . mysql_error() . "<br>". $sql_intro1 . substr($query,  0, -1));
@@ -76,8 +76,8 @@ while ($row = mysql_fetch_assoc($res)) {
 	$str2 .= "{$row["word"]} ";
 }
 
-$query  .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str,  0, -1))) ."', $para)";
-$query2 .= "($vID, $b, $c, $v, '". addslashes(addslashes(substr($str2, 0, -1))) ."')";
+$query  .= "($vID, $b, $c, $v, '". addslashes(substr($str,  0, -1)) ."', $para)";
+$query2 .= "($vID, $b, $c, $v, '". addslashes(substr($str2, 0, -1)) ."')";
 
 mysql_query($sql_intro1 . $query)  or die(__LINE__ . "<br>" . mysql_error() . "<br>". $sql_intro1 . $query);
 mysql_query($sql_intro2 . $query2) or die(__LINE__ . "<br>" . mysql_error() . "<br>". $sql_intro2 . $query2);
