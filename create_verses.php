@@ -3,6 +3,8 @@
 error_reporting(E_ALL);
 set_time_limit(9999999);
 
+require 'config.php';
+
 die('Are you sure?');
 /*********************
  * delcare variables *
@@ -12,8 +14,8 @@ $html_verses = 'bible_english_html';
 $searchable  = 'bible_english_verses';
 
 
-$db = mysql_connect("localhost", "XXXXXXXXX", "XXXXXXXXXXXXXX");
-mysql_select_db("bf", $db);
+$db = mysql_connect(HOST, USER, PASS);
+mysql_select_db(BASE, $db);
 
 /// Not needed for English version.
 //mysql_query("SET NAMES utf8");
@@ -71,7 +73,7 @@ while ($row = mysql_fetch_assoc($res)) {
 		if (strpos($class_str, ' ') !== false) $class_str = "'$class_str'";
 		$str .= $class_str;
 	}
-	//$str  .= " id={$row["id"]}>" . str_replace("'", '’', $row["word"]) . '</a> ';
+	//$str  .= " id={$row["id"]}>" . str_replace("'", 'ï¿½', $row["word"]) . '</a> ';
 	$str  .= " id={$row["id"]}>" . $row["word"] . '</a> ';
 	$str2 .= "{$row["word"]} ";
 }
