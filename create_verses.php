@@ -20,6 +20,50 @@ mysql_select_db(BASE, $db);
 /// Not needed for English version.
 //mysql_query("SET NAMES utf8");
 
+$query = "SHOW TABLES";
+$res   = mysql_query($query) or die(mysql_error() . "<br>" . $query);
+$has_html_verses = false;
+$has_searchable  = false;
+while ($row = mysql_fetch_row($res)) {
+    if ($row[0] == $html_verses) {
+        $has_html_verses = true;
+    }
+    if ($row[0] == $searchable) {
+        $has_searchable = true;
+    }
+}
+
+/// Create tables if needed
+if (!$has_html_verses) {
+    $query = "CREATE TABLE `" . BASE . "`.`" . $html_verses . "` (
+    `id2` mediumint( 3 ) unsigned NOT NULL AUTO_INCREMENT ,
+    `id` int( 4 ) unsigned NOT NULL ,
+    `book` tinyint( 1 ) unsigned NOT NULL DEFAULT '0',
+    `chapter` tinyint( 1 ) unsigned NOT NULL DEFAULT '0',
+    `verse` tinyint( 1 ) unsigned NOT NULL DEFAULT '0',
+    `words` text CHARACTER SET latin1 NOT NULL ,
+    `paragraph` tinyint( 1 ) unsigned NOT NULL ,
+    PRIMARY KEY ( `id2` ) ,
+    KEY `verseID` ( `id` ) ,
+    KEY `book` ( `book` )
+    ) ENGINE = MYISAM DEFAULT CHARSET = utf8;";
+    mysql_query($query) or die(mysql_error() . "<br>" . $query);
+}
+if (!$has_searchable) {
+    $query = "CREATE TABLE `" . BASE . "`.`" . $searchable . "` (
+    `id2` mediumint( 3 ) unsigned NOT NULL AUTO_INCREMENT ,
+    `id` int( 4 ) unsigned NOT NULL ,
+    `book` tinyint( 1 ) unsigned NOT NULL DEFAULT '0',
+    `chapter` tinyint( 1 ) unsigned NOT NULL DEFAULT '0',
+    `verse` tinyint( 1 ) unsigned NOT NULL DEFAULT '0',
+    `words` text CHARACTER SET latin1 NOT NULL ,
+    PRIMARY KEY ( `id2` ) ,
+    KEY `verseID` ( `id` ) ,
+    KEY `book` ( `book` ) ,
+    FULLTEXT KEY `words` ( `words` )
+    ) ENGINE = MYISAM DEFAULT CHARSET = utf8;";
+    mysql_query($query) or die(mysql_error() . "<br>" . $query);
+}
 
 $query  = "SELECT id, verseID, book, chapter, verse, word, divine, red, implied, paragraph FROM $table ORDER BY id";
 
