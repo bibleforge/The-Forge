@@ -1,7 +1,7 @@
 <?php
 
 $array_str = '
-[["ge","gen","genasis","genasi","genesis","genesi","genisis","genisi","gn"],
+[["ge","gen","genasis","genasi","genesis","genesi","genisis","genisi","gn","gne"],
 ["ex","exo","exod","exodus","exodu"],
 ["lev","leviticus","levitikus","leviticas","levitikas","laviticus","lavitikus","laviticas","lavitikas","leviticu","levitiku","lv","lav"],
 ["nm","nu","num","numbers","number"],
