@@ -20,4 +20,4 @@ foreach ($arr as $value) {
 }
 
 echo substr($str, 0, -1);
-echo '],';
+echo '];';
