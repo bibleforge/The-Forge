@@ -131,4 +131,3 @@ mysql_query($sql_intro2 . $query2) or die(__LINE__ . "<br>" . mysql_error() . "<
 
 ?>
 done
-
