@@ -35,7 +35,7 @@ $array_str = '
 ["jnh","jon","jonah","jona"],
 ["mi","mic","micah","micha","michah","mikah","mika","mica","mikea","mch","mike"],
 ["na","nah","nahum","nam"],
-["hab","habakkuk","habakuk","habakkak","habakak","habacak","habacuk","habacack","habacuck","habakkuc","habakuc","habakkac","habakac","habacac","habacuc","hb","ha"],
+["hab","habakkuk","habakuk","habakkak","habakak","habacak","habacuk","habacack","habacuck","habakkuc","habakuc","habakkac","habakac","habacac","habacuc","ha"],
 ["zep","zeph","zephaniah","zephania","zepheniah","zephenia","zp"],
 ["hag","hagg","haggai","hagai","hg"],
 ["zch","zc","zk","zck","zec","zeck","zek","zech","zac","zak","zech","zach","zechariah","zecheriah","zecharia","zecheria","zeckariah","zeckeriah","zeckaria","zeckeria","zekariah","zekeriah","zekaria","zekeria","ze","zac","zach","zachariah","zacheriah","zacharia","zacheria","zakariah","zakeriah","zakaria","zakeria","zackariah","zackeriah","zackaria","zackeria","za"],
