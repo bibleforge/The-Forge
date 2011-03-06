@@ -168,13 +168,18 @@ TRANSITIVITY
 	INTRANSITIVE	2
 	BITRANSITIVE	3
 
+TENSE
+	...
+	PAST    7
+	...
 
 
 Questions:
 
-Should IMPERSONAL_ACTIVE be combind with ACTIVE and there be a separate category?
+Should IMPERSONAL_ACTIVE be combined with ACTIVE and there be a separate category?
 Should HEBREW and ARAMAIC be a separate category?
 What is ADVERBIAL_IMPERATIVE?
 What is IMPERATIVE_SENSE_PARTICIPLE?
 Should there be an IMPERSONAL category?
 What does "with relative pronoun" mean for PARTICLE_ATTACHED?
+Can IMPERFECT, AORIST, PERFECT, and/or PLUPERFECT be combined to form a pseudo past tense form?
