@@ -469,6 +469,6 @@ echo "<div>Double checking...</div>";
 
 @ob_flush();flush();
 
-include "testers/check_grammar_parsing.php";
+include "helpers/check_grammer_parsing.php";
 
 run_double_checker();
