@@ -41,7 +41,7 @@ $array_str = '
 ["zch","zc","zk","zck","zec","zeck","zek","zech","zac","zak","zech","zach","zechariah","zecheriah","zecharia","zecheria","zeckariah","zeckeriah","zeckaria","zeckeria","zekariah","zekeriah","zekaria","zekeria","ze","zac","zach","zachariah","zacheriah","zacharia","zacheria","zakariah","zakeriah","zakaria","zakeria","zackariah","zackeriah","zackaria","zackeria","za"],
 ["mal","malachi","malaci","malaki","malacki","malaki","malechi","maleci","maleki","malecki","maleki","malachai","malacai","malakai","malackai","malakai","malechai","malecai","malekai","maleckai","malekai","ml"],
 ["mat","matt","matthew","matthuw","matthuew","mattheuw","mathew","mathuw","mathuew","matheuw","mt"],
-["mar","mark","mk","mr","mrk"],
+["mar","mark","makr","mk","mr","mrk"],
 ["lk","lke","lu","luk","luke"],
 ["jhn","jn","jo","joh","john"],
 ["ac","act","acts","act","acts of the apostles","acts of the apostle","the acts of the apostles","the acts of the apostle","act of the apostles","act of the apostle","the act of the apostles","the act of the apostle"],
