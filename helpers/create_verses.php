@@ -10,9 +10,6 @@ function create_verses($lang)
     error_reporting(E_ALL);
     set_time_limit(9999999);
     
-    require 'config.php';
-    
-    die('Are you sure?');
     /*********************
     * delcare variables *
     *********************/
@@ -109,7 +106,10 @@ function create_verses($lang)
             $str2 = "";
         }
         
-        if ($row['word'] === '') continue;
+        /// Skip empty words.
+        if ($row['word'] === '') {
+            continue;
+        }
         
         $str .= "<a";
         if ($row['divine'] == 1 || $row['red'] == 1 || $row['implied'] == 1) {
