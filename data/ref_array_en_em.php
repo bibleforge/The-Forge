@@ -1,7 +1,7 @@
 <?php
 
-$array_str = '
-[["ge","gen","genasis","genasi","genesis","genesi","genisis","genisi","gn","gne"],
+$array_str = '[
+["ge","gen","genasis","genasi","genesis","genesi","genisis","genisi","gn","gne"],
 ["ex","exo","exod","exodus","exodvs","exodu","exodv"],
 ["lev","leu","leviticus","leuiticus","levitikus","leuitikus","leviticas","leuiticas","levitikas","laviticus","lavitikus","laviticas","lavitikas","leviticu","levitiku","lv","lav"],
 ["nm","nu","nv","num","nvm","numbers","nvmbers","number","nvmber"],
@@ -66,8 +66,8 @@ $array_str = '
 ["2 jn","second jn","2nd jn","ii jn","ij jn","2 jo","second jo","2nd jo","ii jo","ij jo","2 john","second john","2nd john","ii john","ij john","2jo","2jn","2john","2 in","second in","2nd in","ii in","ij in","2 io","second io","2nd io","ii io","ij io","2 iohn","second iohn","2nd iohn","ii iohn","ij iohn","2io","2in","2iohn"],
 ["3 jn","iii jn","iij jn","3rd jn","third jn","3 jo","iii jo","iij jo","3rd jo","third jo","3 john","iii john","iij john","3rd john","third john","3jo","3jn","3john","3 in","iii in","iij in","3rd in","third in","3 io","iii io","iij io","3rd io","third io","3 iohn","iii iohn","iij iohn","3rd iohn","third iohn","3io","3in","3iohn"],
 ["jud","jude","ju","iud","iude","iu"],
-["apoc","apock","apok","apac","apack","apak","apocalypse","apocalyps","apocalipse","apocalips","apockalypse","apockalyps","apockalipse","apockalips","apokalypse","apokalyps","apokalipse","apokalips","apacalypse","apacalyps","apacalipse","apacalips","apackalypse","apackalyps","apackalipse","apackalips","apakalypse","apakalyps","apakalipse","apakalips","rev","reu","revelation","reuelation","revalation","reualation","revelatian","reuelatian","revalatian","reualatian","revelations","reuelations","revalations","reualations","revelatians","reuelatians","revalatians","reualatians","rv","ru"]]
-';
+["apoc","apock","apok","apac","apack","apak","apocalypse","apocalyps","apocalipse","apocalips","apockalypse","apockalyps","apockalipse","apockalips","apokalypse","apokalyps","apokalipse","apokalips","apacalypse","apacalyps","apacalipse","apacalips","apackalypse","apackalyps","apackalipse","apackalips","apakalypse","apakalyps","apakalipse","apakalips","rev","reu","revelation","reuelation","revalation","reualation","revelatian","reuelatian","revalatian","reualatian","revelations","reuelations","revalations","reualations","revelatians","reuelatians","revalatians","reualatians","rv","ru"]
+]';
 $json_str = str_replace("\n","",$array_str);
 $arr = json_decode($json_str, true);
 

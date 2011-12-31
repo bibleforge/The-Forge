@@ -1,7 +1,7 @@
 <?php
 
-$array_str = '
-[["ge","gen","genasis","genasi","genesis","genesi","genisis","genisi","gn","gne"],
+$array_str = '[
+["ge","gen","genasis","genasi","genesis","genesi","genisis","genisi","gn","gne"],
 ["ex","exo","exod","exodus","exodu"],
 ["lev","leviticus","levitikus","leviticas","levitikas","laviticus","lavitikus","laviticas","lavitikas","leviticu","levitiku","lv","lav"],
 ["nm","nu","num","numbers","number"],
@@ -66,8 +66,8 @@ $array_str = '
 ["2 jn","second jn","2nd jn","ii jn","2 jo","second jo","2nd jo","ii jo","2 john","second john","2nd john","ii john","2jo","2jn","2john"],
 ["3 jn","iii jn","3rd jn","third jn","3 jo","iii jo","3rd jo","third jo","3 john","iii john","3rd john","third john","3jo","3jn","3john"],
 ["jud","jude","ju"],
-["apoc","apock","apok","apac","apack","apak","apocalypse","apocalyps","apocalipse","apocalips","apockalypse","apockalyps","apockalipse","apockalips","apokalypse","apokalyps","apokalipse","apokalips","apacalypse","apacalyps","apacalipse","apacalips","apackalypse","apackalyps","apackalipse","apackalips","apakalypse","apakalyps","apakalipse","apakalips","rev","revelation","revalation","revelatian","revalatian","revelations","revalations","revelatians","revalatians","rv"]]
-';
+["apoc","apock","apok","apac","apack","apak","apocalypse","apocalyps","apocalipse","apocalips","apockalypse","apockalyps","apockalipse","apockalips","apokalypse","apokalyps","apokalipse","apokalips","apacalypse","apacalyps","apacalipse","apacalips","apackalypse","apackalyps","apackalipse","apackalips","apakalypse","apakalyps","apakalipse","apakalips","rev","revelation","revalation","revelatian","revalatian","revelations","revalations","revelatians","revalatians","rv"]
+]';
 $json_str = str_replace("\n","",$array_str);
 $arr = json_decode($json_str, true);
 
