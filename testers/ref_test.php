@@ -13,6 +13,7 @@ include "ref_test_config.php";
 </style>
 <script>
     var BF = {};
+    BF.langs = {};
 </script>
 <script src="<?php echo PATH_TO_LANG; ?>"></script>
 <script>
@@ -23,7 +24,7 @@ var books_re = <?php preg_match("/books_re = (.*,)$/m", file_get_contents(PATH_T
 
 <?php
 
-require_once '../data/ref_array.php';
+require_once '../data/ref_array_en_em.php';
 echo 'var refs = '. $array_str . ";\n";
 ?>
 var i, books_re_worked, book_arr_re_worked, re_other_worked, book, v, c;
@@ -36,7 +37,7 @@ for (j in refs) {
         //if (refs[j][i].length == 1) continue;
         //if (/^[1-3] [a-z]$/.test(refs[j][i])) continue;
         books_re_worked = books_re.test(refs[j][i]);
-        book = BF.lang.determine_reference(refs[j][i]);
+        book = BF.langs.en_em.determine_reference(refs[j][i]);
         if (book !== false) {
             v = book % 1000; /// Calculate the verse.
             c = ((book - v) % 1000000) / 1000; /// Calculate the chapter.
@@ -53,7 +54,7 @@ for (j in refs) {
         
         re_other_worked = re_other.test(refs[j][i] + " 1:1");
 
-        document.write("<tr><td>" + refs[j][i] + "</td><td class=" + (books_re_worked ? "worked" : "notworked") + ">" + books_re_worked + "</td><td class=" + (book_arr_re_worked ? "worked" : "notworked") + ">" + book_arr_re_worked + " " + BF.lang.books_short[book] + "</td><td class=" + (re_other_worked ? "worked" : "notworked") + ">" + re_other_worked + "</td></tr>")
+        document.write("<tr><td>" + refs[j][i] + "</td><td class=" + (books_re_worked ? "worked" : "notworked") + ">" + books_re_worked + "</td><td class=" + (book_arr_re_worked ? "worked" : "notworked") + ">" + book_arr_re_worked + " " + BF.langs.en_em.books_short[book] + "</td><td class=" + (re_other_worked ? "worked" : "notworked") + ">" + re_other_worked + "</td></tr>")
         
         if (!books_re_worked) --wrong[0];
         if (!book_arr_re_worked) --wrong[1];
