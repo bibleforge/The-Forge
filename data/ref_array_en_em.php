@@ -8,7 +8,7 @@ $array_str = '[
 ["deu","dev","due","dve","deut","devt","deuteronomy","devteronomy","devteronomie","deuteronomie","deuteronamy","deuteronamie","devteronamy","devteronamie","du","dv","dut","dvt","duteronomy","duteronomie","dvteronomy","dvteronomie","duteronamy","duet","dueteronomy","dueteronamy","dt"],
 ["jos","josh","joshua","joshva","ios","iosh","ioshua","ioshva"],
 ["jd","jdg","jgd","jds","jdgs","jgds","jgs","judg","jvdg","judges","jvdges","judgs","jvdgs","judge","jvdge","ig","id","idg","igd","ids","idgs","igds","igs","iudg","ivdg","iudges","ivdges","iudgs","ivdgs","iudge","ivdge","ig"],
-["rt","rth","ru","rut","ruth","rv","rvt","rvth"],
+["rt","rth","ru","rut","ruth","rvt","rvth"],
 ["1 sa","i sa","1st sa","first sa","1 sam","i sam","1st sam","first sam","1 samuel","1 samvel","i samuel","i samvel","1st samuel","1st samvel","first samuel","first samvel","1 sm","i sm","1st sm","first sm","1sa","1st samuel","1st samvel","1sam","1sm","1samuel","1samvel","sam","samuel","samvel"],
 ["2 sa","second sa","2nd sa","ii sa","ij sa","2 sam","second sam","2nd sam","ii sam","ij sam","2 samuel","2 samvel","second samuel","second samvel","2nd samuel","2nd samvel","ii samuel","ii samvel","ij samuel","2 sm","second sm","2nd sm","ii sm","ij sm","2nd samuel","2nd samvel","2sa","2sm","2sam","2samuel","2samvel"],
 ["1 kgs","i kgs","1st kgs","first kgs","1 kg","i kg","1st kg","first kg","1 ki","i ki","1st ki","first ki","1 kings","i kings","1st kings","first kings","1 king","i king","1st king","first king","1ki","kings","king","1kings","1king","1kgs","1kg"],
@@ -42,7 +42,7 @@ $array_str = '[
 ["mal","malachi","malaci","malaki","malacki","malaki","malechi","maleci","maleki","malecki","maleki","malachai","malacai","malakai","malackai","malakai","malechai","malecai","malekai","maleckai","malekai","ml"],
 ["mat","math","matt","matthew","matthuw","matthvw","matthuew","matthvew","mattheuw","matthevw","mathew","mathuw","mathvw","mathuew","mathvew","matheuw","mathevw","mt"],
 ["mar","mark","marke","makr","makre","mk","mke","mr","mrk","mrke"],
-["lk","lke","lu","luk","luke","lv","lvk","lvke"],
+["lk","lke","lu","luk","luke","lvk","lvke"],
 ["jhn","jn","jo","joh","john","ihn","in","io","ioh","iohn"],
 ["ac","act","acte","acts","actes","acts of the apostles","actes of the apostles","acts of the apostle","actes of the apostle","the acts of the apostles","the actes of the apostles","the acts of the apostle","the actes of the apostle","act of the apostles","acte of the apostles","act of the apostle","acte of the apostle","the act of the apostles","the acte of the apostles","the act of the apostle","the acte of the apostle"],
 ["rm","ro","rom","romans","romanes","roman","romane","rome"],
@@ -66,7 +66,7 @@ $array_str = '[
 ["2 jn","second jn","2nd jn","ii jn","ij jn","2 jo","second jo","2nd jo","ii jo","ij jo","2 john","second john","2nd john","ii john","ij john","2jo","2jn","2john","2 in","second in","2nd in","ii in","ij in","2 io","second io","2nd io","ii io","ij io","2 iohn","second iohn","2nd iohn","ii iohn","ij iohn","2io","2in","2iohn"],
 ["3 jn","iii jn","iij jn","3rd jn","third jn","3 jo","iii jo","iij jo","3rd jo","third jo","3 john","iii john","iij john","3rd john","third john","3jo","3jn","3john","3 in","iii in","iij in","3rd in","third in","3 io","iii io","iij io","3rd io","third io","3 iohn","iii iohn","iij iohn","3rd iohn","third iohn","3io","3in","3iohn"],
 ["jud","jude","ju","iud","iude","iu","the generall epistle of jude","the generall epistle of iude","the general epistle of jude","the general epistle of iude","the epistle generall of jude","the epistle generall of iude","generall epistle of jude","generall epistle of iude"],
-["apoc","apock","apok","apac","apack","apak","apocalypse","apocalyps","apocalipse","apocalips","apockalypse","apockalyps","apockalipse","apockalips","apokalypse","apokalyps","apokalipse","apokalips","apacalypse","apacalyps","apacalipse","apacalips","apackalypse","apackalyps","apackalipse","apackalips","apakalypse","apakalyps","apakalipse","apakalips","rev","reu","revelation","reuelation","revalation","reualation","revelatian","reuelatian","revalatian","reualatian","revelations","reuelations","revalations","reualations","revelatians","reuelatians","revalatians","reualatians","rv","ru"]
+["apoc","apock","apok","apac","apack","apak","apocalypse","apocalyps","apocalipse","apocalips","apockalypse","apockalyps","apockalipse","apockalips","apokalypse","apokalyps","apokalipse","apokalips","apacalypse","apacalyps","apacalipse","apacalips","apackalypse","apackalyps","apackalipse","apackalips","apakalypse","apakalyps","apakalipse","apakalips","rev","reu","revelation","reuelation","revalation","reualation","revelatian","reuelatian","revalatian","reualatian","revelations","reuelations","revalations","reualations","revelatians","reuelatians","revalatians","reualatians","rv"]
 ]';
 $json_str = str_replace("\n","",$array_str);
 $arr = json_decode($json_str, true);
