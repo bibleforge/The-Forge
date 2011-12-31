@@ -123,8 +123,9 @@ function create_verses($lang)
             if (strpos($class_str, ' ') !== false) $class_str = "'$class_str'";
             $str .= $class_str;
         }
-        /// Convert straight quotes to curly quotes for the HTML version.
-        $str  .= " id={$row["id"]}>" . str_replace("'", '�', $row["word"]) . '</a> ';
+        // /// Convert straight quotes to curly quotes for the HTML version.
+        //$str  .= " id={$row["id"]}>" . str_replace("'", '�', $row["word"]) . '</a> ';
+        $str  .= " id={$row["id"]}>" . $row["word"] . '</a> ';
         $str2 .= "{$row["word"]} ";
     }
     
