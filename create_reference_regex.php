@@ -1,6 +1,14 @@
 <?php
 
-$file = 'data/ref_array.php';
+echo "Enter language: ";
+$lang = trim(fgets(STDIN));
+
+$file = 'data/ref_array_' . $lang . '.php';
+
+if (!file_exists($file)) {
+    echo "Sorry, but '" . $file . "' does not exist.\n";
+    die(1);
+}
 
 require_once $file;
 require_once 'helpers/array2regex.php';
