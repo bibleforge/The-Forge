@@ -46,7 +46,7 @@ $new_data = preg_replace_callback('/(src|href)="([^"]+)\.(js|css)(?:\?\d*)?"/', 
 
 $new_data = preg_replace_callback('/(\S+)(\:\s*\{[^\}]+modified\:\s*)(?:\d*)(\D)/', 'replace_callback_index2', $new_data);
 
-if ($new_data && strlen($new_data) >= strlen($data) - 20) {
+if ($new_data && $new_data !== $data && strlen($new_data) >= strlen($data) - 20) {
     file_put_contents(BF_DIR . $filename, $new_data);
 }
 
@@ -70,6 +70,6 @@ $data = file_get_contents_utf8(BF_DIR . $filename);
 
 $new_data = preg_replace_callback('/BF.include\("(\/js\/secondary.js)(?:\?\d*)?",/', 'replace_callback_main', $data);
 
-if ($new_data && strlen($new_data) >= strlen($data) - 20) {
+if ($new_data && $new_data !== $data && strlen($new_data) >= strlen($data) - 20) {
     file_put_contents(BF_DIR . $filename, $new_data);
 }
