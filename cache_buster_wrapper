@@ -1,0 +1,7 @@
+# Run cache_buster.php over and over again to automatically update the necessary files.
+
+while true
+do
+    php -q cache_buster.php < /dev/null
+    sleep 5
+done

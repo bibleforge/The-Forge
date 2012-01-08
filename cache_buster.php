@@ -26,7 +26,6 @@ function replace_callback_index1($matches)
 
 function replace_callback_index2($matches)
 {
-    //print_r($matches);die;
     $time = filemtime(BF_DIR . '/js/lang/' . $matches[1] . '.js');
     
     /// Did the time return correctly?
@@ -45,7 +44,7 @@ $data = file_get_contents_utf8(BF_DIR . $filename);
 
 $new_data = preg_replace_callback('/(src|href)="([^"]+)\.(js|css)(?:\?\d*)?"/', 'replace_callback_index1', $data);
 
-$new_data = preg_replace_callback('/(\S+)(\:\s*\{[^\}]+modified\:\s*)(?:\d*)(\D)/', 'replace_callback_index2', $data);
+$new_data = preg_replace_callback('/(\S+)(\:\s*\{[^\}]+modified\:\s*)(?:\d*)(\D)/', 'replace_callback_index2', $new_data);
 
 if ($new_data && strlen($new_data) >= strlen($data) - 20) {
     file_put_contents(BF_DIR . $filename, $new_data);
