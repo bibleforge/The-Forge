@@ -118,7 +118,7 @@ function sig_handler($signo)
 }
 
 if ($is_service) {
-    $sleep_time = (intval($argv[1]) == $argv[1] ? intval($argv[1]) : 5);
+    $sleep_time = ($argv[1] > 0 ? intval($argv[1]) : 5);
     
     ///TODO: Determine if ticks are actually useful.
     declare(ticks=1);
@@ -154,4 +154,5 @@ if ($is_service) {
     }
 } else {
     update();
+    echo "done\n";
 }
