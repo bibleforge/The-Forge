@@ -25,9 +25,14 @@ function file_get_contents_utf8($fn)
     return mb_convert_encoding($content, 'UTF-8', mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true));
 }
 
+function get_time_from_BF_era($file)
+{
+    return filemtime($file) - 1326361000;
+}
+
 function replace_callback_main($matches)
 {
-    $time = filemtime(BF_DIR . $matches[1]);
+    $time = get_time_from_BF_era(BF_DIR . $matches[1]);
     
     /// Did the time return correctly?
     if ($time) {
@@ -40,7 +45,7 @@ function replace_callback_main($matches)
 
 function replace_callback_index1($matches)
 {
-    $time = filemtime(BF_DIR . $matches[2] . '.' . $matches[3]);
+    $time = get_time_from_BF_era(BF_DIR . $matches[2] . '.' . $matches[3]);
     
     /// Did the time return correctly?
     if ($time) {
@@ -53,7 +58,7 @@ function replace_callback_index1($matches)
 
 function replace_callback_index2($matches)
 {
-    $time = filemtime(BF_DIR . '/js/lang/' . $matches[1] . '.js');
+    $time = get_time_from_BF_era(BF_DIR . '/js/lang/' . $matches[1] . '.js');
     
     /// Did the time return correctly?
     if ($time) {
