@@ -36,7 +36,8 @@ function create_verses($lang)
         }
     }
     
-    /// Create tables if needed
+    /// Create tables if the do not exist; empty them if they do.
+    
     if (!$has_html_verses) {
         $query = "CREATE TABLE `" . BASE . "`.`" . $html_verses . "` (
         `id` int( 4 ) unsigned NOT NULL ,
@@ -51,7 +52,11 @@ function create_verses($lang)
         KEY `book` ( `book` )
         ) ENGINE = MYISAM DEFAULT CHARSET = utf8;";
         mysql_query($query) or die(mysql_error() . "<br>" . $query);
+    } else {
+        $query = 'TRUNCATE TABLE `' . $html_verses . '`';
+        mysql_query($query) or die(mysql_error() . "<br>" . $query);
     }
+    
     if (!$has_searchable) {
         $query = "CREATE TABLE `" . BASE . "`.`" . $searchable . "` (
         `id` int( 4 ) unsigned NOT NULL ,
@@ -65,6 +70,9 @@ function create_verses($lang)
         KEY `book` ( `book` ) ,
         FULLTEXT KEY `words` ( `words` )
         ) ENGINE = MYISAM DEFAULT CHARSET = utf8;";
+        mysql_query($query) or die(mysql_error() . "<br>" . $query);
+    } else {
+        $query = 'TRUNCATE TABLE `' . $searchable . '`';
         mysql_query($query) or die(mysql_error() . "<br>" . $query);
     }
     
