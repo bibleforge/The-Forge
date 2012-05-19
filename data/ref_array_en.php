@@ -5,7 +5,7 @@ $array_str = '[
 ["ex","exo","exod","exodus","exodu"],
 ["lev","leviticus","levitikus","leviticas","levitikas","laviticus","lavitikus","laviticas","lavitikas","leviticu","levitiku","lv","lav"],
 ["nm","nu","num","numbers","number"],
-["deu","due","deut","deuteronomy","deuteronamy","du","dut","duteronomy","duteronamy","duet","dueteronomy","dueteronamy","dt"],
+["deu","due","deut","deuteronomy","deuteronamy","du","dut","duteronomy","duteronamy","duet","dueteronomy","dueteronamy","dt","deutoronomy"],
 ["jos","josh","joshua"],
 ["jd","jdg","jgd","jds","jdgs","jgds","jgs","judg","judges","judgs","judge","jg"],
 ["rt","rth","ru","rut","ruth"],

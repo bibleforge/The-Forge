@@ -5,7 +5,7 @@ $array_str = '[
 ["ex","exo","exod","exodus","exodvs","exodu","exodv"],
 ["lev","leu","leviticus","leuiticus","levitikus","leuitikus","leviticas","leuiticas","levitikas","laviticus","lavitikus","laviticas","lavitikas","leviticu","levitiku","lv","lav"],
 ["nm","nu","nv","num","nvm","numbers","nvmbers","number","nvmber"],
-["deu","dev","due","dve","deut","devt","deuteronomy","devteronomy","devteronomie","deuteronomie","deuteronamy","deuteronamie","devteronamy","devteronamie","du","dv","dut","dvt","duteronomy","duteronomie","dvteronomy","dvteronomie","duteronamy","duet","dueteronomy","dueteronamy","dt","deutoronomy"],
+["deu","dev","due","dve","deut","devt","deuteronomy","devteronomy","devteronomie","deuteronomie","deuteronamy","deuteronamie","devteronamy","devteronamie","du","dv","dut","dvt","duteronomy","duteronomie","dvteronomy","dvteronomie","duteronamy","duet","dueteronomy","dueteronamy","dt","deutoronomy","deutoronomie"],
 ["jos","josh","joshua","joshva","ios","iosh","ioshua","ioshva"],
 ["jd","jdg","jgd","jds","jdgs","jgds","jgs","judg","jvdg","judges","jvdges","judgs","jvdgs","judge","jvdge","ig","id","idg","igd","ids","idgs","igds","igs","iudg","ivdg","iudges","ivdges","iudgs","ivdgs","iudge","ivdge","ig"],
 ["rt","rth","ru","rut","ruth","rvt","rvth"],
