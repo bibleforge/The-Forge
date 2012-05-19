@@ -3,7 +3,7 @@
 /**
  * Create the html and plain text tables for a Bible verion.
  *
- * @example create_verses('english');
+ * @example create_verses('en');
  */
 function create_verses($lang)
 {

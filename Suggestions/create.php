@@ -16,7 +16,7 @@ $phase2_start_at_verse = 3027027;
 
 $upper_limit = 1000;
 
-$language = "english";
+$language = "en";
 $index = "verse_text";
 
 $table = "bible_" . $language;
@@ -378,7 +378,8 @@ function find_words_and_hits(&$cur_words, $text_arr, $word)
 
 function get_text($in)
 {
-	$query = "SELECT words FROM bible_english_verses WHERE id IN ($in)";
+    global $language;
+	$query = "SELECT words FROM bible_" . $language . "_verses WHERE id IN ($in)";
 	$res = mysql_query($query) or die(mysql_error() . "<br>$query<br>" . __LINE__);
 	$array = array();
 	while ($row = mysql_fetch_assoc($res)) {
