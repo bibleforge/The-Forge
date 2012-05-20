@@ -16,5 +16,5 @@ this.ask = (function ()
                 callback(answer);
             }
         });
-    }
+    };
 }());
