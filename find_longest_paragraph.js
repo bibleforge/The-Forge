@@ -1,11 +1,7 @@
-var input,
-    rl = require('readline'),
+var ask = require("./helpers/ask.js").ask,
     query = require("./helpers/db.js").query;
 
-
-input = rl.createInterface(process.stdin, process.stdout, null);
-
-input.question("Enter language: ", function(lang) {
+ask("Enter language: ", function(lang) {
     
     query("SELECT id, id2 FROM bible_" + lang + "_html WHERE paragraph = 1", function (data)
     {
@@ -30,8 +26,5 @@ input.question("Enter language: ", function(lang) {
         
         console.log(info);
         console.log(max);
-        
-        input.close();
-        process.stdin.destroy();
     });
 });
