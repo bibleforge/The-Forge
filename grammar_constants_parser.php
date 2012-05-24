@@ -2,11 +2,9 @@
 
 $debug = false;
 
-echo '<pre>';
-
 $file = 'data/Grammar Constants.txt';
 
-$comment = "///NOTE: Created in the Forge via " . basename(__FILE__) . " on " . date('m-d-Y') . " from " . basename($file) . ".\n"; 
+$comment = "        ///NOTE: Created in the Forge via " . basename(__FILE__) . " on " . date('m-d-Y') . " from " . basename($file) . ".\n"; 
 
 $text = file_get_contents($file);
 
@@ -73,33 +71,24 @@ var morph_grammar = {'NOUN':'[1,1]','VERB':'[1,2]',...};
 
 */
 
-$php_str = "";
-$js_str = "";
+$js_str  = '        grammar_keywords:   {';
+$js_str2 = '        grammar_categories: [""';
 
 foreach ($data as $key => $category) {
 	$cat_const = key($category);
 	/// Old PHP format
 	//$php_str .= "define('" . addslashes($cat_const) . "', " . (int)$key . ");\n";
-	$php_str .= "case " . (int)$key . ":\n\t\$attr = '" . addslashes(strtolower($cat_const)) . "';\n\tbreak;\n";
+	//$php_str .= "case " . (int)$key . ":\n\t\$attr = '" . addslashes(strtolower($cat_const)) . "';\n\tbreak;\n";
+	$js_str2 .= ', "' . addslashes(strtolower($cat_const)) . '"';
 	foreach ($category[$cat_const] as $subcat_num => $subcat_const) {
 		$js_str .= $subcat_const . ': "[' . (int)$key . ',' . (int)$subcat_num . ']", '; 
 	}
 }
 
-echo "/*****************\n";
-echo " * PHP constants *\n";
-echo " *****************/\n";
-echo "\n";
+$js_str2 .= '],';
+$js_str   = substr($js_str, 0, -2) . '},';
 
 echo $comment;
-echo $php_str;
-
+echo $js_str;
 echo "\n";
-echo "\n";
-echo "/****************\n";
-echo " * JS constants *\n";
-echo " ****************/\n";
-echo "\n";
-
-echo $comment;
-echo 'grammar_keywords:	{' . substr($js_str, 0, -2) . '},';
+echo $js_str2;
