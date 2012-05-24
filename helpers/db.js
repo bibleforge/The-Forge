@@ -19,7 +19,7 @@ this.query = (function ()
         db.query().execute(sql, [], function (err, data)
         {
             if (typeof callback === "function") {
-                callback(data);
+                callback(data, err);
             }
         });
     }
