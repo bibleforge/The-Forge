@@ -143,6 +143,30 @@ DECLENSION	23
 	SECOND_DECLENSION	2
 	THIRD_DECLENSION	3
 
+LANGUAGE 24
+    HEBREW  1
+	ARAMAIC	2
+	GREEK   3
+
+DERIVATION 25
+    HEBREW  1
+    ARAMAIC 2
+
+
+Deletions:
+
+VOICE	8
+    ...
+	MIDDLE_DEPONENT						4
+	PASSIVE_DEPONENT					5
+	...
+	AMBIGUOUS_MIDDLE_PASSIVE_DEPONENT	88 (or 8)
+	...
+
+PART_OF_SPEECH	4
+    ...
+	HEBREW					12
+	ARAMAIC					13
 
 
 Insertions:
@@ -183,3 +207,7 @@ What is IMPERATIVE_SENSE_PARTICIPLE?
 Should there be an IMPERSONAL category?
 What does "with relative pronoun" mean for PARTICLE_ATTACHED?
 Can IMPERFECT, AORIST, PERFECT, and/or PLUPERFECT be combined to form a pseudo past tense form?
+
+Other:
+
+Start with 0 (both main categories and subcategories).
