@@ -29,9 +29,9 @@ NUMBER	5
 	PLURAL		2
 
 PERSON	6
-	FIRST_PERSON	1
-	SECOND_PERSON	2
-	THIRD_PERSON	3
+    FIRST_PERSON   1    1ST_PERSON
+    SECOND_PERSON  2    2ND_PERSON
+    THIRD_PERSON   3    3RD_PERSON
 
 TENSE	7
 	PRESENT			1
@@ -146,11 +146,11 @@ DECLENSION	23
 LANGUAGE 24
     HEBREW  1
 	ARAMAIC	2
-	GREEK   3
+	GREEK   3  KONIE
 
 DERIVATION 25
-    HEBREW  1
-    ARAMAIC 2
+    HEBREW_DERIVED  1
+    ARAMAIC_DERIVED 2
 
 
 Deletions:
@@ -201,7 +201,6 @@ TENSE
 Questions:
 
 Should IMPERSONAL_ACTIVE be combined with ACTIVE and there be a separate category?
-Should HEBREW and ARAMAIC be a separate category?
 What is ADVERBIAL_IMPERATIVE?
 What is IMPERATIVE_SENSE_PARTICIPLE?
 Should there be an IMPERSONAL category?
@@ -211,3 +210,4 @@ Can IMPERFECT, AORIST, PERFECT, and/or PLUPERFECT be combined to form a pseudo p
 Other:
 
 Start with 0 (both main categories and subcategories).
+    However, sometimes, 0 can mean none or unspecified.

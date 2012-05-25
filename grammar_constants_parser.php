@@ -27,7 +27,7 @@ foreach ($arr as $line) {
 	
 	/// Found a constant
 	
-	preg_match('/(\t)?([A-Z\d_]+)\s+(\d+)/', $line, $match);
+	preg_match('/(\s)?([A-Z\d_]+)\s+(\d+)/', $line, $match);
 	
 	/// Was a new category found?
 	if ($match[1] == "") {
