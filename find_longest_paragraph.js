@@ -1,9 +1,9 @@
 var ask = require("./helpers/ask.js").ask,
-    query = require("./helpers/db.js").query;
+    db = require("./helpers/db.js").db;
 
 ask("Enter language: ", function(lang)
 {
-    query("SELECT id, id2 FROM bible_" + lang + "_html WHERE paragraph = 1", function (data)
+    db.query("SELECT id, id2 FROM bible_" + lang + "_html WHERE paragraph = 1", function (data)
     {
         var i,
             info,

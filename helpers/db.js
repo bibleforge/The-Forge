@@ -1,6 +1,6 @@
 var config = require("../config.js").config; 
 
-this.query = (function ()
+this.db = (function ()
 {
     var db = new (require("db-mysql")).Database({
         hostname: config.db.host,
@@ -14,13 +14,30 @@ this.query = (function ()
         
     db.query().execute("SET NAMES 'utf8'", {async: false});
     
-    return function db_query(sql, callback)
-    {
-        db.query().execute(sql, [], function (err, data)
+    return {
+        query: function db_query(sql, callback)
         {
-            if (typeof callback === "function") {
-                callback(data, err);
-            }
-        });
-    }
+            db.query().execute(sql, [], function (err, data)
+            {
+                if (typeof callback === "function") {
+                    callback(data, err);
+                }
+            });
+        },
+        query_sync: function db_query(sql)
+        {
+            var res;
+            
+            db.query().execute(sql, [], function (err, data)
+            {
+                if (err) {
+                    console.log(err);
+                    console.log(sql);
+                }
+                res = data;
+            }, {async: false});
+            
+            return res;
+        }
+    };
 }());
