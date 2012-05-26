@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Translit.js</title>
+    <style>
+    #type_here {
+        width: 100%;
+        height: 200px;
+        font-family: "Ezra SIL", "SBL Hebrew", "Galatia SIL", "SBL Greek";
+        font-size: 24px;
+    }
+    
+    p {
+        margin: 0;
+        font-family: Gentium, "Charis SIL", "Doulos SIL";
+        font-size: 18px;
+    }
+    </style>
+  </head>
+  <body>
+  Enter Greek and/or Hebrew below.
+  <textarea id=type_here>בְּרֵאשִׁ֖ית בָּרָ֣א אֱלֹהִ֑ים אֵ֥ת הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃ 
+Βίβλος γενέσεως Ἰησοῦ Χριστοῦ, υἱοῦ Δαβίδ, υἱοῦ Ἀβραάμ</textarea>
+  <select id=trans_type>
+    <option value=dic>Biblical Reconstructed Dictionary Form</option>
+    <option value=ipa>Biblical Reconstructed IPA</option>
+    <option value=dic_mod>Modern Dictionary Form</option>
+    <option value=ipa_mod>Modern IPA</option>
+    <option value=sbl>Society of Biblical Languages Transliteration</option>
+  <select>
+  <div id=results></div>
+  </body>
+  <script src="translit.js"></script>
+  <script>
+    var last_text,
+        last_type,
+        trans_type  = document.getElementById("trans_type"),
+        type_here   = document.getElementById("type_here"),
+        results_div = document.getElementById("results");
+    
+    function show_results()
+    {
+        var data = {dic: "", ipa: "", dic_mod: "", ipa_mod: "", sbl: ""},
+            i,
+            len,
+            text = type_here.value,
+            text_arr,
+            tmp_data,
+            type = trans_type.value;
+        
+        if (text === last_text && last_type === type) {
+            return;
+        }
+        
+        last_text = text;
+        last_type = type;
+        
+        text_arr = text.split(/\n/g);
+        
+        len = text_arr.length;
+        for (i = 0; i < len; i += 1) {
+            tmp_data = translit(text_arr[i].replace(/\s+/g, " ").trim());
+            data.dic     += "<p>" + tmp_data.dic     + "</p>";
+            data.ipa     += "<p>" + tmp_data.ipa     + "</p>";
+            data.dic_mod += "<p>" + tmp_data.dic_mod + "</p>";
+            data.ipa_mod += "<p>" + tmp_data.ipa_mod + "</p>";
+            data.sbl     += "<p>" + tmp_data.sbl     + "</p>";
+        }
+        
+        
+        switch (type) {
+        case "dic":
+            results_div.innerHTML = data.dic;
+            break;
+        case "ipa":
+            results_div.innerHTML = data.ipa;
+            break;
+        case "dic_mod":
+            results_div.innerHTML = data.dic_mod;
+            break;
+        case "ipa_mod":
+            results_div.innerHTML = data.ipa_mod;
+            break;
+        case "sbl":
+            results_div.innerHTML = data.sbl;
+            break;
+        }
+    }
+    
+    window.setInterval(show_results, 100);
+    
+    show_results();
+  </script>
+</html>
