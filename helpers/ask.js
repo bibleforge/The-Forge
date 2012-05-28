@@ -1,20 +1,18 @@
 this.ask = (function ()
 {
-    var rl = require("readline");
+    var callback;
     
-    return function (str, callback)
+    process.stdin.on("data", function (chunk) {
+        process.stdin.pause();
+        callback(chunk.substr(0, chunk.length - 1));
+    });
+    
+    return function (str, cb)
     {
-        var input = rl.createInterface(process.stdin, process.stdout, null);
+        callback = cb;
+        process.stdout.write(str);
         
-        input.question(str, function(answer)
-        {
-            /// Without these two lines, the program would hang.
-            input.close();
-            process.stdin.destroy();
-            
-            if (typeof callback === "function") {
-                callback(answer);
-            }
-        });
+        process.stdin.setEncoding("utf8");
+        process.stdin.resume();
     };
 }());
