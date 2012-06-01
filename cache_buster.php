@@ -43,20 +43,7 @@ function replace_callback_main($matches)
     }
 }
 
-function replace_callback_index1($matches)
-{
-    $time = get_time_from_BF_era(BF_DIR . $matches[2] . '.' . $matches[3]);
-    
-    /// Did the time return correctly?
-    if ($time) {
-        return $matches[1] . '="' . $matches[2] . '.' . $matches[3] . '?' . $time . '"';
-    } else {
-        /// Just return the found string if it couldn't figure out the last modified time.
-        return $matches[0];
-    }
-}
-
-function replace_callback_index2($matches)
+function replace_callback_main2($matches)
 {
     $time = get_time_from_BF_era(BF_DIR . '/js/lang/' . $matches[1] . '.js');
     
@@ -69,6 +56,18 @@ function replace_callback_index2($matches)
     }
 }
 
+function replace_callback_index1($matches)
+{
+    $time = get_time_from_BF_era(BF_DIR . $matches[2] . '.' . $matches[3]);
+    
+    /// Did the time return correctly?
+    if ($time) {
+        return $matches[1] . '="' . $matches[2] . '.' . $matches[3] . '?' . $time . '"';
+    } else {
+        /// Just return the found string if it couldn't figure out the last modified time.
+        return $matches[0];
+    }
+}
 
 
 function update()
@@ -85,6 +84,8 @@ function update()
     
     $new_data = preg_replace_callback('/BF.include\("(\/js\/secondary.js)(?:\?\d*)?",/', 'replace_callback_main', $data);
     
+    $new_data = preg_replace_callback('/([a-zA-Z0-9_]+)(\s*=\s*\{[^\}]+modified\:\s*)(?:\d*)(\D)/', 'replace_callback_main2', $new_data);
+    
     if ($new_data && $new_data !== $data && strlen($new_data) >= strlen($data) - 20) {
         file_put_contents(BF_DIR . $filename, $new_data);
     }
@@ -97,8 +98,6 @@ function update()
     $data = file_get_contents_utf8(BF_DIR . $filename);
     
     $new_data = preg_replace_callback('/(src|href)="([^"]+)\.(js|css)(?:\?\d*)?"/', 'replace_callback_index1', $data);
-    
-    $new_data = preg_replace_callback('/(\S+)(\:\s*\{[^\}]+modified\:\s*)(?:\d*)(\D)/', 'replace_callback_index2', $new_data);
     
     if ($new_data && $new_data !== $data && strlen($new_data) >= strlen($data) - 20) {
         file_put_contents(BF_DIR . $filename, $new_data);
