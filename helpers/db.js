@@ -3,6 +3,7 @@ var config = require("../config.js").config;
 this.db = (function ()
 {
     var db = new (require("db-mysql")).Database({
+        charset:  "utf8", /// With this, we do not need to send "SET NAMES utf8;" when the connection is made.
         hostname: config.db.host,
         user:     config.db.user,
         password: config.db.pass,
@@ -11,8 +12,6 @@ this.db = (function ()
     });
     
     db.connect({async: false});
-        
-    db.query().execute("SET NAMES 'utf8'", {async: false});
     
     return {
         query: function db_query(sql, callback)
