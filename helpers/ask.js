@@ -2,8 +2,10 @@ this.ask = (function ()
 {
     var callback;
     
-    process.stdin.on("data", function (chunk) {
+    process.stdin.on("data", function (chunk)
+    {
         process.stdin.pause();
+        /// substr() is to remove the trailing new line.
         callback(chunk.substr(0, chunk.length - 1));
     });
     
