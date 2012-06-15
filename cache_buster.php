@@ -69,6 +69,19 @@ function replace_callback_index1($matches)
     }
 }
 
+function replace_callback_index_nonjs1($matches)
+{
+    $time = get_time_from_BF_era(BF_DIR . $matches[2]);
+    
+    /// Did the time return correctly?
+    if ($time) {
+        return $matches[1] . $matches[2] . '?' . $time . '"';
+    } else {
+        /// Just return the found string if it couldn't figure out the last modified time.
+        return $matches[0];
+    }
+}
+
 
 function update()
 {
@@ -98,6 +111,18 @@ function update()
     $data = file_get_contents_utf8(BF_DIR . $filename);
     
     $new_data = preg_replace_callback('/(src|href)="([^"]+)\.(js|css)(?:\?\d*)?"/', 'replace_callback_index1', $data);
+    
+    if ($new_data && $new_data !== $data && strlen($new_data) >= strlen($data) - 20) {
+        file_put_contents(BF_DIR . $filename, $new_data);
+    }
+    
+    /// Update index_non-js.html.
+        
+    $filename = '../server/index_non-js.html';
+    
+    $data = file_get_contents_utf8(BF_DIR . $filename);
+    
+    $new_data = preg_replace_callback('/(href=")([^"]+\.css)(?:\?\d*)?"/', 'replace_callback_index_nonjs1', $data);
     
     if ($new_data && $new_data !== $data && strlen($new_data) >= strlen($data) - 20) {
         file_put_contents(BF_DIR . $filename, $new_data);
