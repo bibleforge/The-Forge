@@ -1,7 +1,11 @@
 <?php
 
-echo "Enter language: ";
+echo "Enter language: (en) ";
 $lang = trim(fgets(STDIN));
+
+if ($lang === "") {
+    $lang = "en";
+}
 
 require 'config.php';
 
