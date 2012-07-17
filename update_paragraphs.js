@@ -46,8 +46,10 @@ ask("Enter Language: (en) ", function (lang)
             }
         });
         
-        /// Display the new file after changing the paragraphs.
-        console.log(new_file);
+        /// Backup old file.
+        fs.renameSync(filename, filename + "_" + Date.now())
+        /// Create new paragraph file.
+        fs.writeFileSync(filename, new_file, "utf8");
     });
     
     /// Load the modules while the user is typing.
