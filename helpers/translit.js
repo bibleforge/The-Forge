@@ -753,11 +753,19 @@ this.translit = (function ()
                             case "ʁ":
                                 dic_unit = "r";
                                 break;
-                            case "h":
-                            case "ħ":
                             case "χ":
                             case "x":
                             case "ç":
+                                /// Gutteral (not glottal) sounds are "h" at syllable initial and "k" syllable final.
+                                if ((i === 0 || phonetic_units[pos].info.stress_type) && !is_last) {
+                                    dic_unit = "h";
+                                } else {
+                                    /// Syllable final phones become "k"
+                                    dic_unit = "k";
+                                }
+                                break;
+                            case "h":
+                            case "ħ":
                                 /// Ignore syllable final H sounds.
                                 if ((i === 0 || phonetic_units[pos].info.stress_type) && !is_last) {
                                     dic_unit = "h";
