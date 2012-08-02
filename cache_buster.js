@@ -24,7 +24,7 @@ start_watching = (function ()
         var match,
             pos = 0,
             res = [];
-        //console.log(regex)
+        
         /// If it has the global flag, it cannot return the elements in the parenthases, so just run the regex and exit.
         if (regex.global) {
             return str.match(regex);
@@ -36,37 +36,17 @@ start_watching = (function ()
             pos += match.index + (match[0].length || 1);
         }
         
-        //console.log(res)
         return res;
     }
     
     var data = fs.readFileSync(config.static_path + "/js/main.js", "utf8");
     
-    //console.log(match_all(/([a-zA-Z0-9_]+)(\s*=\s*\{[^\}]+modified\:\s*)(?:\d*)(\D)/, data)[1]);
-    //console.log(match_all(/(en_em)(\s*=\s*\{)/, data)[1]);
-    //console.log(match_all(/([a-zA-Z0-9_]+)(\s*=\s*\{\n.*\n\s*modified:\s*)(\d+)/, data)[0][1]);process.exit();
-    
     function create_onchange(file_to_watch, file_to_change, last_time, regex, replace_str_pre)
     {
-        /*
-        console.log();
-        console.log(file_to_watch);
-        console.log(file_to_change);
-        console.log(last_time);
-        console.log(regex);
-        console.log();
-        
-        console.log("here1: " + file_to_watch);
-        process.exit();
-        */
         /// Make sure that it is an integer so that it can be compared with the new time.
         last_time = parseInt(last_time);
         return function ()
         {
-            /*
-            console.log();
-            console.log("A change on " + file_to_watch);
-            */
             if (debugging) {
                 console.log("here2: " + file_to_watch);
             }
@@ -79,11 +59,7 @@ start_watching = (function ()
                 /// Does it need to be updated?
                 if (last_time !== time) {
                     last_time = time;
-                    //console.log(regex)
-                    //console.log("$1?" + last_time)
                     fs.writeFileSync(file_to_change, fs.readFileSync(file_to_change, "utf8").replace(regex, replace_str_pre + last_time), "utf8");
-                    //console.log("Did it work?");
-                    //console.log();
                 }
             });
         };
@@ -107,12 +83,6 @@ start_watching = (function ()
                     file_to_watch   = explained_obj.file_to_watch;
                     replace_regex   = explained_obj.replace_regex;
                     replace_str_pre = explained_obj.replace_str_pre;
-                    /*
-                    console.log(file_to_watch)
-                    console.log(replace_regex)
-                    console.log(replace_str_pre)
-                    process.exit();
-                    */
                 } else {
                     file_to_watch   = config.static_path + match[2];
                     replace_regex   = new RegExp("(" + (match[1] + match[2]).replace(/(\()/g, "\\$1") + ")(?:\\?\\d*)?")
@@ -128,13 +98,7 @@ start_watching = (function ()
                     /// Since the file could have been changed before cache_buster was started, check them all at start up.
                     setTimeout(onchange, 0);
                 }
-                /*
-                console.log(match[0]);
-                console.log(match[1]);
-                console.log(match[2]);
-                console.log(match[3]);
-                */
-                //new RegExp("(" + match[1] + match[2] + ")(?:\?\d*)?");
+                
                 if (start_watching) {
                     fs.watch(file_to_watch, onchange);
                 }
