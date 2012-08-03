@@ -52,7 +52,7 @@ start_watching = (function ()
             }
             fs.stat(file_to_watch, function (err, stats)
             {
-                var time = (stats.mtime.getTime() - 1326361000) / 1000;
+                var time = (stats.mtime.getTime() / 1000) - 1326361000;
                 if (debugging) {
                     console.log("here4: " + file_to_watch + " " + last_time + " vs " + time);
                 }
