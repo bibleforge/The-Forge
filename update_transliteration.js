@@ -1,6 +1,6 @@
-var translit = require("./translit.js").translit,
-    dbmysql = require("db-mysql"),
-    db = require("../helpers/db.js").db,
+var translit = require("./helpers/translit.js").translit,
+    dbmysql = require("./helpers/node_modules/db-mysql"),
+    db = require("./helpers/db.js").db,
     res;
 
 function update_lexicon(type)
