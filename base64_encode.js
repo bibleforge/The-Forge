@@ -1,5 +1,6 @@
 /// Usage: node base64_encode.js [in_file [out_file]]
 ///NOTE: Use "" for the second parameter to output directly to STD_OUT.
+///NOTE: On Linux, just use "base64 -w file > file.b64".
 
 "use strict";
 
