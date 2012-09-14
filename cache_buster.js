@@ -81,16 +81,22 @@ start_watching = (function ()
             {
                 var explained_obj,
                     file_to_watch,
+                    last_time,
                     onchange,
-                    replace_regex;
+                    replace_regex,
+                    replace_str_pre;
                 
+                /// Does this file need a special function to handle the matches?
                 if (typeof explain_func === "function") {
+                    /// If there is no easy way to firgure out the files names of both files to watch, a separate function is needed.
                     explained_obj   = explain_func(match);
                     file_to_watch   = explained_obj.file_to_watch;
+                    last_time       = explained_obj.last_time;
                     replace_regex   = explained_obj.replace_regex;
                     replace_str_pre = explained_obj.replace_str_pre;
                 } else {
                     file_to_watch   = config.static_path + match[2];
+                    last_time       = match[3] || 0;
                     replace_regex   = new RegExp("(" + (match[1] + match[2]).replace(/(\()/g, "\\$1") + ")(?:\\?\\d*)?")
                     replace_str_pre = "$1?";
                 }
@@ -98,7 +104,7 @@ start_watching = (function ()
                 if (debugging) {
                     console.log("here3: " + file_to_watch);
                 }
-                onchange = create_onchange(file_to_watch, file_to_change, match[3] || 0, replace_regex, replace_str_pre);
+                onchange = create_onchange(file_to_watch, file_to_change, last_time, replace_regex, replace_str_pre);
                 
                 if (check_now) {
                     /// Since the file could have been changed before cache_buster was started, check them all at start up.
@@ -138,17 +144,33 @@ start_watching = (function ()
 ///      The 3rd captures the time (if any) (but ignoring the optional question mark).
 
 /// index.html
-start_watching(config.static_path + "/index.html", /((?:src|href)=")([^"]+\.(?:js|css))(?:\?(\d*))?/);
+start_watching(config.static_path + "index.html", /((?:src|href)=")([^"]+\.(?:js|css))(?:\?(\d*))?/);
 /// index_non-js.html
-start_watching(config.server_path + "/index_non-js.html", /((?:src|href)=")([^"]+\.(?:js|css))(?:\?(\d*))?/);
+start_watching(config.server_path + "index_non-js.html", /((?:src|href)=")([^"]+\.(?:js|css))(?:\?(\d*))?/);
 /// main.js
-start_watching(config.static_path + "/js/main.js", /(BF.include\(\")(\/js\/secondary.js)(?:\?(\d*))?/);
+start_watching(config.static_path + "js/main.js", /(BF.include\(\")(\/js\/secondary.js)(?:\?(\d*))?/);
 /// main.js (extra languages)
-start_watching(config.static_path + "/js/main.js", /([a-zA-Z0-9_]+)(\s*=\s*\{\n.*\n\s*modified:\s*)(\d+)/, function (match)
+start_watching(config.static_path + "js/main.js", /([a-zA-Z0-9_]+)(\s*=\s*\{\n.*\n\s*modified:\s*)(\d+)/, function (match)
 {
     return {
         file_to_watch:   config.static_path + "js/lang/" + match[1] + ".js",
+        last_time:       match[3] || 0,
         replace_regex:   new RegExp("(" + match[1] + "\\s*=\\s*\{\n.*\n\\s*modified:\\s*)\\d+"),
         replace_str_pre: "$1"
     };
+});
+/// language specific CSS
+fs.readdirSync(config.static_path + "styles/lang/").forEach(function (filename)
+{
+    var path = require("path");
+    
+    start_watching(config.static_path + "js/lang/" + path.basename(filename, path.extname(filename)) + ".js", /^\s*css_modified:\s*(\d+)/m, function (match)
+    {
+        return {
+            file_to_watch:   config.static_path + "styles/lang/" + filename,
+            last_time:       match[1] || 0,
+            replace_regex:   /^(\s*css_modified:\s*)\d+/m,
+            replace_str_pre: "$1"
+        };
+    });
 });
