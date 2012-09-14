@@ -7,8 +7,8 @@ var config,
 if (process.argv.length === 2) {
     require("child_process").exec(process.argv.join(" ") + " bg");
     console.log("Running in the background...");
-    /// Use the "nohup" command if it won't stay in the background.
-    /// E.g., nohup node cache_buster.js > /dev/null
+    ///NOTE: Use the "nohup" command if it won't stay in the background.
+    ///      E.g., nohup node cache_buster.js > /dev/null
     process.exit();
 }
 
@@ -41,6 +41,9 @@ start_watching = (function ()
     
     var data = fs.readFileSync(config.static_path + "/js/main.js", "utf8");
     
+    /**
+     * Create a function that will update a file when changed.
+     */
     function create_onchange(file_to_watch, file_to_change, last_time, regex, replace_str_pre)
     {
         /// Make sure that it is an integer so that it can be compared with the new time.
@@ -65,6 +68,9 @@ start_watching = (function ()
         };
     }
     
+    /**
+     * Prepare to watch files.
+     */
     return function (file_to_change, find_files_regex, explain_func)
     {
         function check_all(start_watching, check_now)
@@ -129,7 +135,7 @@ start_watching = (function ()
 ///NOTE: The regex should have 3 captures
 ///      The 1st captures everything before the filename.
 ///      The 2nd captures the filename
-///      The 3rd captures the time (if there) (but ignoring the optional question mark).
+///      The 3rd captures the time (if any) (but ignoring the optional question mark).
 
 /// index.html
 start_watching(config.static_path + "/index.html", /((?:src|href)=")([^"]+\.(?:js|css))(?:\?(\d*))?/);
