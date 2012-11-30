@@ -86,6 +86,10 @@ start_watching = (function ()
                     replace_regex,
                     replace_str_pre;
                 
+                if (debugging) {
+                    console.log("here5: " + match[2]);
+                }
+                
                 /// Does this file need a special function to handle the matches?
                 if (typeof explain_func === "function") {
                     /// If there is no easy way to firgure out the files names of both files to watch, a separate function is needed.
