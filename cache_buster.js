@@ -151,8 +151,8 @@ start_watching = (function ()
 start_watching(config.static_path + "index.html", /((?:src|href)=")([^"]+\.(?:js|css))(?:\?(\d*))?/);
 /// index_non-js.html
 start_watching(config.server_path + "index_non-js.html", /((?:src|href)=")([^"]+\.(?:js|css))(?:\?(\d*))?/);
-/// main.js
-start_watching(config.static_path + "js/main.js", /(BF.include\(\")(\/js\/secondary.js)(?:\?(\d*))?/);
+/// main.js (secondary.js & night.css)
+start_watching(config.static_path + "js/main.js", /(BF\.include\(\"|link_tag\.href\s*=\s*")(\/js\/secondary\.js|\/styles\/night\.css)(?:\?(\d*))?/);
 /// main.js (extra languages)
 start_watching(config.static_path + "js/main.js", /([a-zA-Z0-9_]+)(\s*=\s*\{\n.*\n\s*modified:\s*)(\d+)/, function (match)
 {
