@@ -184,7 +184,7 @@ NUMERICAL
 	NON_NUMERICAL	2
 
 TYPE
-	NORMAL	0
+	NORMAL	0 (or 99)
 	...
 
 TRANSITIVITY
@@ -210,4 +210,4 @@ Can IMPERFECT, AORIST, PERFECT, and/or PLUPERFECT be combined to form a pseudo p
 Other:
 
 Start with 0 (both main categories and subcategories).
-    However, sometimes, 0 can mean none or unspecified.
+    However, sometimes, 0 can mean none or unspecified, and since it is falesy, could be problematic when programming.
