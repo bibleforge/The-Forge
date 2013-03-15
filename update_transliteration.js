@@ -1,4 +1,4 @@
-var translit = require("./helpers/translit.js").translit,
+var translit = require("./language_tools/originals/translit.js").translit,
     dbmysql = require("./helpers/node_modules/db-mysql"),
     db = require("./helpers/db.js").db,
     res;
