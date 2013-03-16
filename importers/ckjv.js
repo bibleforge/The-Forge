@@ -61,34 +61,8 @@ function split_into_text_verse(data)
 
 function get_data(file)
 {
-    //var matches = require("fs").readFileSync(file, "utf8").trim().replace(/Ｈ/g, "h").replace("<HY>愿他们的腰时常弯下（and bow down their back alway）。」", "<HY>愿他们的腰时常弯下（and bow down their back alway）</HY>。」").replace(/(<HY>[^<]*<)[^/]/g, "$1/HY>").match(/"(\D+?\d+:\d+)[^\n]+?(<HY>[^<]*<[^/])/g);
-    
-    /*
-    matches.forEach(function (match)
-    {
-        var match2;
-        match = match.trim() + "Y>";
-        match2 = match.match(/\s*"\s*([^\s\d]+\d+:\d+).*(<HY>[^<]+<HY>)/);
-        
-        console.log(match2[1] + "\n\"" + match2[2] + "\" should be:\n\"" + match2[2].slice(0, -3) + "/HY>\"\n")
-    });
-    
-    process.exit();
-    */
-    //eval("var " + require("fs").readFileSync(file, "utf8"));
-    //console.log(require("fs").readFileSync(file, "utf8").substr(0, 100))
-    //console.log(JSON.parse(require("fs").readFileSync(file, "utf8").trim().replace("profiles = new Array(", "[").replace(/^\);$/m, "]").replace("loaded_ckjv = true;", "").trim()));
-    //console.log(require("fs").readFileSync(file, "utf8").trim().replace(".*profiles\s*=\s*new\s*Array\s*\(\s*", "[").replace(/^\);$/m, "]").replace("loaded_ckjv = true;", "").trim()));
-    //return profiles;
     ///NOTE: There is some junk data before "profiles" at the beginning of the file, so we use ".*" to get rid of it.
-    //console.log(JSON.parse(require("fs").readFileSync(file, "utf8").trim().replace(/.*profiles\s*=\s*new\s*Array\s*\(\s*/, "[").replace(/^\);$/m, "]").replace("loaded_ckjv = true;", "").trim()));
-    ///NOTE: Applying a (temporary) fix due to the tag "<ＨY>".
-    //replace(/(「)(",\s"\D+\d+:\d+\s)/g, "$2$1").replace(/.*profiles\s*=\s*new\s*Array\s*\(\s*/, "[").replace(/^\);$/m, "]").replace("loaded_ckjv = true;", "").trim());
-    //return JSON.parse(require("fs").readFileSync(file, "utf8").trim().replace(/Ｈ/g, "h").replace(/(「)(",\s"\D+\d+:\d+\s)/g, "$2$1").replace(/.*profiles\s*=\s*new\s*Array\s*\(\s*/, "[").replace(/^\);$/m, "]").replace("loaded_ckjv = true;", "").trim());
-    //var a = JSON.parse(require("fs").readFileSync(file, "utf8").trim().replace(/Ｈ/g, "h").replace("<HY>愿他们的腰时常弯下（and bow down their back alway）。」", "<HY>愿他们的腰时常弯下（and bow down their back alway）</HY>。」").replace(/(<HY>[^<]*<)[^/]/g, "$1/H").replace(/.*profiles\s*=\s*new\s*Array\s*\(\s*/, "[").replace(/^\);$/m, "]").replace("loaded_ckjv = true;", "").trim())
-    //console.log(a[652]);process.exit();
-    // "[^>]*（[^）]*[a-zA-Z][^）]*）
-    
+    ///NOTE: Applying various (temporary) fixes.
     return JSON.parse(require("fs").readFileSync(file, "utf8").trim()
         .replace(/Ｈ/g, "h")
         /// Simp
