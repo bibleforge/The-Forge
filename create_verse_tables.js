@@ -2,7 +2,8 @@
 
 var ask    = require("./helpers/ask.js").ask,
     db     = require("./helpers/db.js").db,
-    yes_no = require("./helpers/ask.js").yes_no;
+    yes_no = require("./helpers/ask.js").yes_no,
+    clean  = require("./helpers/clean_text_for_tables.js").clean;
 
 function done()
 {
@@ -79,6 +80,9 @@ function create_table_structures(lang, callback)
 
 function create_verses(lang)
 {
+    /// Get the space character for this language, if any.
+    var space = require("./helpers/clean_text_for_tables.js").no_spacing[lang] ? "" : " ";
+    
     function check_for_tables(callback)
     {
         does_bible_table_exist(lang + "_html", function (html_exists)
@@ -173,9 +177,12 @@ function create_verses(lang)
                 }
                 phrase_html += class_str;
             }
-            // /// Convert straight quotes to curly quotes for the HTML version.
-            //phrase_html  += " id=" + obj.id + ">" + obj.word.replace(/'/g, '�') + "</a> ";
-            phrase_html += " id=" + obj.id + ">" + obj.word + "</a> ";
+            
+            /// Clean up the word (e.g., convert straight quotes to curly quotes, remove unneeded characters).
+            obj.word = clean(obj.word, lang);
+            
+            phrase_html += " id=" + obj.id + ">" + obj.word + "</a>" + space;
+            ///NOTE: Because the verses text must be machine searchable, it always gets a space between words.
             phrase_verses += obj.word + " ";
         }
         
