@@ -1,0 +1,13 @@
+The Chinese dictionaries are licensed under the CC by-sa 3.0 Unported license and
+were created with content from the following projects:
+
+  * scim-googlepinyin (https://github.com/tchaikov/scim-googlepinyin) by tchaikov under the Apache License 2 license.
+  * VimIM Data Project (https://code.google.com/p/vimim-data/) MIT license.
+  * Wiktionary (https://zh.wiktionary.org) CC by-sa 3.0 Unported.
+
+Everything else not mentioned above can be freely used under the conditions of the MIT license (mit.txt).
+
+Details for those license may be found here:
+  * Apache 2.0: http://opensource.org/licenses/Apache-2.0
+  * CC by-sa 3.0 Unported: https://creativecommons.org/licenses/by-sa/3.0/
+  * MIT: http://opensource.org/licenses/mit-license.php
