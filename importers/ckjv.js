@@ -24,7 +24,8 @@ function split_into_text_verse(data)
         /// Format: BC:V TEXT
         /// Example: 
         ///     创1:1 起初，　上帝创造天地。
-        var split = row.match(/(\D+)([\d]+):([\d]+)\s*(.*)/),
+        ///     創1:3 　上帝說：「要有光」，就有了光。 (NOTE: Sometimes there is intentional whitespace before a word/line).
+        var split = row.match(/(\D+)([\d]+):([\d]+) *(.*)/),
             title;
         
         if (split[1] !== last_book) {
