@@ -36,7 +36,9 @@ function split_into_text_verse(data)
         /// Get Psalm titles.
         if (book === 19 && psalm_has_title(Number(split[2])) && Number(split[3]) === 1) {
             ///NOTE: Psalm titles are placed on verse 1 inside Chinese parentheses (（）).
-            title = split[4].match(/^（([^）]+)/);
+            ///      But because notes can be in parentheses too, check to make sure we don't match that with a negative lookahead.
+            ///      The two dots (..) are to get the last two characters not matched because of the negative lookahead.
+            title = split[4].match(/^（((.(?![^\u0020-\u00ff]）))+..)/);
             
             res[res.length] = {
                 b: book,
