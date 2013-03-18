@@ -13,21 +13,8 @@ function generate_table_structure(lang, word_len, notes_len, callback)
 {
     var sql = [];
     
-    sql[sql.length] = "/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */";
-    sql[sql.length] = "/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;";
-    sql[sql.length] = "/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;";
-    sql[sql.length] = "/*!40101 SET NAMES utf8 */;";
-    sql[sql.length] = "/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;";
-    sql[sql.length] = "/*!40103 SET TIME_ZONE='+00:00' */;";
-    sql[sql.length] = "/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;";
-    sql[sql.length] = "/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;";
-    sql[sql.length] = "/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;";
-    sql[sql.length] = "/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;";
-    
     /// Drop old table (if any)
     sql[sql.length] = "DROP TABLE IF EXISTS `bible_" + lang + "`;";
-    sql[sql.length] = "/*!40101 SET @saved_cs_client     = @@character_set_client */;";
-    sql[sql.length] = "/*!40101 SET character_set_client = utf8 */;";
     
     /// Table structure
     sql[sql.length]      = "CREATE TABLE `bible_" + lang + "` (";
@@ -36,7 +23,7 @@ function generate_table_structure(lang, word_len, notes_len, callback)
     sql[sql.length - 1] += "`book` tinyint(2) unsigned NOT NULL,";
     sql[sql.length - 1] += "`chapter` tinyint(3) unsigned NOT NULL,";
     sql[sql.length - 1] += "`verse` tinyint(3) unsigned NOT NULL,";
-    sql[sql.length - 1] += "`word` char(" + word_len + ") CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,";
+    sql[sql.length - 1] += "`word` char(" + word_len + ") NOT NULL,";
     sql[sql.length - 1] += "`head` tinyint(1) NOT NULL,";
     sql[sql.length - 1] += "`clusterID` tinyint(2) unsigned NOT NULL,";
     sql[sql.length - 1] += "`divine` tinyint(1) unsigned NOT NULL DEFAULT '0',";
@@ -51,8 +38,6 @@ function generate_table_structure(lang, word_len, notes_len, callback)
     sql[sql.length - 1] += "KEY `book` (`book`),";
     sql[sql.length - 1] += "KEY `orig_id` (`orig_id`)";
     sql[sql.length - 1] += ") ENGINE=MyISAM AUTO_INCREMENT=791445 DEFAULT CHARSET=utf8";
-    
-    sql[sql.length] = "/*!40101 SET character_set_client = @saved_cs_client */;";
     
     db.query_arr(sql, function (data, err)
     {

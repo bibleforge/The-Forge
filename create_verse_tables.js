@@ -25,9 +25,6 @@ function create_table_structures(lang, callback)
     /// Drop HTML
     sql[sql.length] = "DROP TABLE IF EXISTS `bible_" + lang + "_html`";
     
-    sql[sql.length] = "/*!40101 SET @saved_cs_client     = @@character_set_client */";
-    sql[sql.length] = "/*!40101 SET character_set_client = utf8 */";
-    
     /// Create HTML
     sql[sql.length]      = "CREATE TABLE `bible_" + lang + "_html` (";
     sql[sql.length - 1] += "`id2` mediumint(3) unsigned NOT NULL AUTO_INCREMENT,";
@@ -35,20 +32,15 @@ function create_table_structures(lang, callback)
     sql[sql.length - 1] += "`book` tinyint(1) unsigned NOT NULL DEFAULT '0',";
     sql[sql.length - 1] += "`chapter` tinyint(1) unsigned NOT NULL DEFAULT '0',";
     sql[sql.length - 1] += "`verse` tinyint(1) unsigned NOT NULL DEFAULT '0',";
-    sql[sql.length - 1] += "`words` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,";
+    sql[sql.length - 1] += "`words` text NOT NULL,";
     sql[sql.length - 1] += "`paragraph` tinyint(1) unsigned NOT NULL,";
     sql[sql.length - 1] += "PRIMARY KEY (`id2`),";
     sql[sql.length - 1] += "KEY `verseID` (`id`),";
     sql[sql.length - 1] += "KEY `book` (`book`)";
     sql[sql.length - 1] += ") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
     
-    sql[sql.length] = "/*!40101 SET character_set_client = @saved_cs_client */";
-    
     /// Drop Verses
     sql[sql.length] = "DROP TABLE IF EXISTS `bible_" + lang + "_verses`";
-    
-    sql[sql.length] = "/*!40101 SET @saved_cs_client     = @@character_set_client */";
-    sql[sql.length] = "/*!40101 SET character_set_client = utf8 */";
     
     /// Create Verses
     sql[sql.length]      = "CREATE TABLE `bible_" + lang + "_verses` (";
@@ -57,15 +49,12 @@ function create_table_structures(lang, callback)
     sql[sql.length - 1] += "`book` tinyint(1) unsigned NOT NULL DEFAULT '0',";
     sql[sql.length - 1] += "`chapter` tinyint(1) unsigned NOT NULL DEFAULT '0',";
     sql[sql.length - 1] += "`verse` tinyint(1) unsigned NOT NULL DEFAULT '0',";
-    sql[sql.length - 1] += "`words` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,";
-    sql[sql.length - 1] += "`paragraph` tinyint(1) unsigned NOT NULL,";
+    sql[sql.length - 1] += "`words` text NOT NULL,";
     sql[sql.length - 1] += "PRIMARY KEY (`id2`),";
     sql[sql.length - 1] += "KEY `verseID` (`id`),";
     sql[sql.length - 1] += "KEY `book` (`book`),";
     sql[sql.length - 1] += "FULLTEXT KEY `words` (`words`)";
     sql[sql.length - 1] += ") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
-    
-    sql[sql.length] = "/*!40101 SET character_set_client = @saved_cs_client */";
     
     db.query_arr(sql, function (data, err)
     {
@@ -127,7 +116,6 @@ function create_verses(lang)
                     sql_verses += "(" + last_verseID + ", " + last_b + ", " + last_c + ", " + last_v + ", '" + phrase_verses.trim().replace(/'/g, "\\'") + "')";
                     first = false;
                     
-                    //console.log(sql_html.length)
                     if (sql_html.length > 70000 || obj.end) {
                         queries_html[queries_html.length] = intro_html + sql_html;
                         queries_verses[queries_verses.length] = intro_verses + sql_verses;
@@ -197,7 +185,7 @@ function create_verses(lang)
                         console.log(err);
                         throw "Error";
                     }
-                    //console.log(pos, how_many, data.length);
+                    
                     data.forEach(function (datum)
                     {
                         add_word(datum);
