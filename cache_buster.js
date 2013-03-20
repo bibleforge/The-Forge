@@ -51,13 +51,13 @@ start_watching = (function ()
         return function ()
         {
             if (debugging) {
-                console.log("here2: " + file_to_watch);
+                console.log((new Error).stack.replace(/[^\n]*\n[^\n]*\:(\d+\:\d+)[\s\S]*/, "$1"), file_to_watch);
             }
             fs.stat(file_to_watch, function (err, stats)
             {
                 var time = (stats.mtime.getTime() / 1000) - 1326361000;
                 if (debugging) {
-                    console.log("here4: " + file_to_watch + " " + last_time + " vs " + time);
+                    console.log((new Error).stack.replace(/[^\n]*\n[^\n]*\:(\d+\:\d+)[\s\S]*/, "$1"), file_to_watch + " " + last_time + " vs " + time);
                 }
                 /// Does it need to be updated?
                 if (last_time !== time) {
@@ -87,7 +87,7 @@ start_watching = (function ()
                     replace_str_pre;
                 
                 if (debugging) {
-                    console.log("here5: " + match[2]);
+                    console.log((new Error).stack.replace(/[^\n]*\n[^\n]*\:(\d+\:\d+)[\s\S]*/, "$1"), match[2]);
                 }
                 
                 /// Does this file need a special function to handle the matches?
@@ -106,7 +106,7 @@ start_watching = (function ()
                 }
                 
                 if (debugging) {
-                    console.log("here3: " + file_to_watch);
+                    console.log((new Error).stack.replace(/[^\n]*\n[^\n]*\:(\d+\:\d+)[\s\S]*/, "$1"), file_to_watch);
                 }
                 onchange = create_onchange(file_to_watch, file_to_change, last_time, replace_regex, replace_str_pre);
                 
