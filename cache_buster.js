@@ -178,3 +178,8 @@ fs.readdirSync(config.static_path + "styles/lang/").forEach(function (filename)
         };
     });
 });
+/// Chinese language files
+/// Simplified Chinese
+start_watching(config.static_path + "js/lang/zh_s.js", /(BF.include\("|"GET",\s*\")([^"?]+)\?(\d*)/);
+/// Traditional Chinese
+start_watching(config.static_path + "js/lang/zh_t.js", /(BF.include\("|"GET",\s*\")([^"?]+)\?(\d*)/);
