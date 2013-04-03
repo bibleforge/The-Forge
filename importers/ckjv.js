@@ -67,7 +67,7 @@ function get_data(file)
     ///NOTE: There is some junk data before "profiles" at the beginning of the file, so we use ".*" to get rid of it.
     ///NOTE: Applying various (temporary) fixes.
     return JSON.parse(require("fs").readFileSync(file, "utf8").trim()
-        .replace(/Ｈ/g, "h")
+        .replace(/Ｈ/g, "H")
         /// Simp
         .replace("<HY>愿他们的腰时常弯下（and bow down their back alway）。」", "<HY>愿他们的腰时常弯下（and bow down their back alway）</HY>。」")
         .replace("滑土（slime）和沥青（pitch）", "<HY>滑土（slime）</HY><HY>和沥青（pitch）</HY>")
@@ -83,6 +83,9 @@ function get_data(file)
         .replace("。不料（behold），", "。<HY>不料（behold）</HY>，")
         .replace("<HY>并有一人必然来到（and one shall certainly come），并且泛滥经过（and overflow, and pass through）<HY>", "<HY>并有一人必然来到（and one shall certainly come）</HY>，<HY>并且泛滥经过（and overflow, and pass through）</HY>")
         .replace("<HY>正如经上所写的：「（as it is written）</HY>", "<HY>正如经上所写的：（as it is written）</HY>「")
+        .replace("众女daughters）", "众女（daughters）") /// 结26:8
+        .replace("<HY>已经（have）</HY> known", "<HY>已经（have known）</HY>认识") /// 约一2:14
+        
         
         /// Trad
         .replace("<HY>願他們的腰時常彎下（and bow down their back alway）。」", "<HY>願他們的腰時常彎下（and bow down their back alway）</HY>。 」")
@@ -99,6 +102,8 @@ function get_data(file)
         .replace("。不料（behold），", "。<HY>不料（behold）</HY>，")
         .replace("<HY>並有一人必然來到（and one shall certainly come），並且氾濫經過（and overflow, and pass through）<HY>", "<HY>並有一人必然來到（and one shall certainly come）</HY>，<HY>並且氾濫經過（and overflow, and pass through）</HY>")
         .replace("<HY>正如經上所寫的：「（as it is written）</HY>", "<HY>正如經上所寫的：（as it is written）</HY>「")
+        .replace("眾女daughters）", "眾女（daughters）")
+        .replace("<HY>已經（have）</HY> known", "<HY>已經（have known）</HY>認識")
         
         .replace(/(<HY>[^<]*<)[^/]/g, "$1/H")
         .replace(/.*profiles\s*=\s*new\s*Array\s*\(\s*/, "[").replace(/^\);$/m, "]").replace("loaded_ckjv = true;", "").trim());
