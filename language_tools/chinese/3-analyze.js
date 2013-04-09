@@ -66,4 +66,5 @@ Object.keys(analysis).forEach(function (char)
     }
 });
 
-console.log("this.analysis =", JSON.stringify(analysis));
+/// Remove quotes from L, R, and M (since it will not be loaded as JSON).
+console.log("this.analysis =", JSON.stringify(analysis).replace(/"([LRM])"/g, "$1"));

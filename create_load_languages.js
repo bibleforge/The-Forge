@@ -16,7 +16,7 @@ fs.readdirSync(config.static_path + "js/lang/").forEach(function (filename)
         console.log("    if (!BF.lang." + lang + ") {");
         console.log("        BF.langs." + lang + " = {");
         console.log("            full_name: \"" + lang_obj.full_name + "\",");
-        console.log("            modified: 0,");
+        console.log("            modified: 0,"); ///NOTE: We don't need to set "modified" here since it will be set by cache_buster.js.
         console.log("            match_lang: " + lang_obj.match_lang + ",");
         console.log("        };");
         console.log("    }");

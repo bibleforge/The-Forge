@@ -128,4 +128,5 @@ for (i = sorted.length - 1; i > 0 ;i -= 1) {
 
 /// Store points used to recreate the curve.
 simplify_curve(plot, amount_to_simplify);
-require("fs").writeFileSync(plot_file, JSON.stringify(plot));
+/// Remove quotes from x and y (since it will not be loaded as JSON).
+require("fs").writeFileSync(plot_file, JSON.stringify(plot).replace(/"([xy])"/g, "$1"));

@@ -11,5 +11,3 @@ exports.clean = function (word, lang)
     
     return word;
 }
-
-exports.no_spacing = {"zh_s": 1, "zh_t": 1};

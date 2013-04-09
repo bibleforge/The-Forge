@@ -69,8 +69,8 @@ function create_table_structures(lang, callback)
 
 function create_verses(lang)
 {
-    /// Get the space character for this language, if any.
-    var space = require("./helpers/clean_text_for_tables.js").no_spacing[lang] ? "" : " ";
+    /// Get the space symbol for that language (if any).
+    var space = require(config.static_path + "js/lang/" + lang + ".js").BF.langs[lang];
     
     function check_for_tables(callback)
     {
