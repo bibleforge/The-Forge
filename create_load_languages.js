@@ -8,6 +8,7 @@ fs.readdirSync(config.static_path + "js/lang/").forEach(function (filename)
         lang,
         lang_obj;
     
+    /// en.js is loaded by default, so the stub does not need to be added to main.js.
     if (filename !== "en.js") {
         lang = path.basename(filename, path.extname(filename));
         lang_obj = require(config.static_path + "js/lang/" + filename).BF.langs[lang];
