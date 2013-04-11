@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Traditional Chinese to Simplified Chinese</title>
+    <style>
+    textarea {
+        width: 100%;
+        height: 200px;
+        font-size: 24px;
+    }
+    </style>
+  </head>
+  <body>
+  Enter Traditional Chinese below:
+  <textarea id=type_here>「不可為自己作甚麼雕刻的像，也不可作甚麼形像彷彿上天、下地，和地底下、水中的百物。</textarea>
+  Simplified Chinese result:
+  <textarea  id=results></textarea >
+  </body>
+  <script src="trad2simp_map.js"></script>
+  <script src="trad2simp.js"></script>
+  <script>
+    var last_text,
+        type_here   = document.getElementById("type_here"),
+        results_el = document.getElementById("results");
+    
+    function show_results()
+    {
+        var text = type_here.value;
+        
+        if (text === last_text) {
+            return;
+        }
+        
+        last_text = text;
+        
+        results_el.value = trad2simp(text);
+    }
+    
+    window.setInterval(show_results, 100);
+    
+    show_results();
+  </script>
+</html>
