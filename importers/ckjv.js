@@ -68,6 +68,8 @@ function get_data(file)
     ///NOTE: Applying various (temporary) fixes.
     return JSON.parse(require("fs").readFileSync(file, "utf8").trim()
         .replace(/Ｈ/g, "H")
+        .replace(/fromthe/g, "from the")
+        
         /// Simp
         .replace("<HY>愿他们的腰时常弯下（and bow down their back alway）。」", "<HY>愿他们的腰时常弯下（and bow down their back alway）</HY>。」")
         .replace("滑土（slime）和沥青（pitch）", "<HY>滑土（slime）</HY><HY>和沥青（pitch）</HY>")
