@@ -62,4 +62,3 @@ dict.forEach(function (entry)
 });
 
 process.stdout.write("};");
-

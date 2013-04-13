@@ -1,17 +1,18 @@
 "use strict";
 
-///NOTE: Since node reuses the same module, segment.js cannot be required twice.
-var auto_convert = require("../language_tools/chinese/0-auto_convert.js").run,
+var auto_convert,
     create_verse_tables = require("../create_verse_tables.js").run,
     download_file = require("../helpers/download.js").download,
     fs = require("fs"),
-    random_numbers = require("../helpers/random.js").random_numbers,
-    segmentor = require("../language_tools/chinese/segment.js"),
-    segment_simp,
-    segment_trad;
+    language_dir = process.cwd() + "/language_tools/chinese/",
+    random_numbers = require("../helpers/random.js").random_numbers;
 
-segment_simp = segmentor.segment_init("./analysis_simp.js", "./language_tools/chinese/dict_raw_simp");
-segment_trad = segmentor.segment_init("./analysis_trad.js", "./language_tools/chinese/dict_raw_trad", true);
+auto_convert = require(language_dir + "0-auto_convert.js").run;
+
+function copy_file(old_path, new_path)
+{
+    fs.writeFileSync(new_path, fs.readFileSync(old_path));
+}
 
 function psalm_has_title(c)
 {
@@ -225,7 +226,7 @@ function import_text(context, data_file, name, lang, segment, word_len, notes_le
 
 function create_simplified_version(trad)
 {
-    return require("../language_tools/chinese/trad2simp.js").trad2simp(trad);
+    return require(language_dir + "trad2simp.js").trad2simp(trad);
 }
 
 function run_auto_convert(type, text, callback)
@@ -233,9 +234,31 @@ function run_auto_convert(type, text, callback)
     var tmpfile = process.cwd() + "/tmp_ckjv_" + type + "_" + random_numbers();
     fs.writeFileSync(tmpfile, text);
     
-    auto_convert(process.cwd() + "/language_tools/chinese/dict_" + type + ".js", tmpfile, function ()
+    auto_convert(language_dir + "dict_" + type + ".js", tmpfile, function (files)
     {
+        /// Remove temporary CKJV file.
         fs.unlinkSync(tmpfile);
+        
+        /// Copy the analysis file to the Chinese language code section.
+        fs.unlinkSync(language_dir + "analysis_" + type + ".js");
+        copy_file(files.analysis_file, language_dir + "analysis_" + type + ".js");
+        
+        /// Copy the weights file to the Chinese language code section.
+        ///NOTE: This file is not currently used, but it code be useful since it takes a long time to generate.
+        fs.unlinkSync(language_dir + "weights_" + type + ".js");
+        copy_file(files.weights_file, language_dir + "weights_" + type + ".js");
+        
+        /// Copy the analysis file to the Chinese language code section.
+        fs.unlinkSync(language_dir + "dict_raw_" + type);
+        copy_file(files.raw_file, language_dir + "dict_raw_" + type);
+        
+        console.log("********************");
+        console.log("New files generated:");
+        console.log("Do not forget to copy the dictionary file" + files.raw_file + ",");
+        console.log("integrate " + files.analysis_file + " file into the lang file for " + type + ",");
+        console.log("and integreate the plot data from " + files.plot_data_file + " into both the segmentors.");
+        console.log("********************");
+        
         callback();
     });
 }
@@ -252,6 +275,7 @@ function start_importaing(trad_file, context, callback)
         lang_trad = "zh_t",
         word_len  = 255,
         notes_len = 1,
+        segmentor = require(language_dir + "segment.js"),
         trad_text = fs.readFileSync(trad_file, "utf8");
     
     function get_simp()
@@ -260,6 +284,8 @@ function start_importaing(trad_file, context, callback)
             console.log("Importing " + name_simp + "...");
             run_auto_convert("simp", create_simplified_version(trad_text), function ()
             {
+                var segment_simp = segmentor.segment_init("./analysis_simp.js", language_dir + "dict_raw_simp");
+                
                 console.log("Importing into database...");
                 import_text(context, create_simplified_version(trad_text), name_simp, lang_simp, segment_simp, word_len, notes_len, function ()
                 {
@@ -276,9 +302,10 @@ function start_importaing(trad_file, context, callback)
     {
         if (import_trad) {
             console.log("Importing " + name_trad + "...");
-            //import_text(context, trad_text, name_trad, lang_trad, segment_trad, word_len, notes_len, context.done);
             run_auto_convert("trad", trad_text, function ()
             {
+                segment_trad = segmentor.segment_init("./analysis_trad.js", language_dir + "dict_raw_trad", true);
+                
                 console.log("Importing into database...");
                 import_text(context, trad_text, name_trad, lang_trad, segment_trad, word_len, notes_len, function ()
                 {
