@@ -62,11 +62,11 @@ function split_into_text_verse(data)
     return res;
 }
 
-function get_data(file)
+function get_data(data)
 {
     ///NOTE: There is some junk data before "profiles" at the beginning of the file, so we use ".*" to get rid of it.
     ///NOTE: Applying various (temporary) fixes.
-    return JSON.parse(require("fs").readFileSync(file, "utf8").trim()
+    return JSON.parse(data
         .replace(/Ｈ/g, "H")
         .replace(/fromthe/g, "from the")
         
@@ -218,80 +218,233 @@ function import_text(context, data_file, name, lang, segment, word_len, notes_le
     });
 }
 
+function create_simplified_version(trad)
+{
+    return require("../language_tools/chinese/trad2simp.js").trad2simp(trad);
+}
+
+function start_importaing(trad_file, context, callback)
+{
+    var check_simp,
+        check_trad,
+        import_simp = true,
+        import_trad = true,
+        name_simp = "Simplified Chinese (简体中文)",
+        name_trad = "Traditional Chinese (繁體中文)",
+        lang_simp = "zh_s",
+        lang_trad = "zh_t",
+        word_len  = 255,
+        notes_len = 1,
+        trad_text = require("fs").readFileSync(trad_file, "utf8");
+    
+    function get_simp()
+    {
+        if (import_simp) {
+            console.log("Importing " + name_simp + "...");
+            import_text(context, create_simplified_version(trad_text), name_simp, lang_simp, segment_simp, word_len, notes_len, get_trad);
+        } else {
+            get_trad();
+        }
+    }
+    
+    function get_trad()
+    {
+        if (import_trad) {
+            console.log("Importing " + name_trad + "...");
+            import_text(context, trad_text, name_trad, lang_trad, segment_trad, word_len, notes_len, context.done);
+        } else {
+            if (callback) {
+                callback();
+            }
+        }
+    }
+    
+    check_simp = function ()
+    {
+        context.does_bible_table_exist(lang_simp, function (exists)
+        {
+            if (!exists) {
+                check_trad();
+            } else {
+                context.yes_no("Do you want to overwrite bible_" + lang_simp + "? ", function (overwrite)
+                {
+                    if (!overwrite) {
+                        import_simp = false;
+                    }
+                    check_trad();
+                }, ["red", "bold"]);
+            }
+        });
+    };
+    
+    check_trad = function ()
+    {
+        context.does_bible_table_exist(lang_trad, function (exists)
+        {
+            if (!exists) {
+                get_simp();
+            } else {
+                context.yes_no("Do you want to overwrite bible_" + lang_trad + "? ", function (overwrite)
+                {
+                    if (!overwrite) {
+                        import_trad = false;
+                    }
+                    get_simp();
+                }, ["red", "bold"]);
+            }
+        });
+    };
+    
+    /// Start by checking if the tables already exist.
+    check_simp();
+}
+
+var human_readable = (function ()
+{
+    var places = {
+        accurate:   [1024, 1048576, 1073741824, 1099511627776, 1125899906842624, 1152921504606847000],
+        inaccurate: [1000, 1000000, 1000000000, 1000000000000, 1000000000000000, 1000000000000000000]
+    };
+    
+    return function human_readable(bytes, inaccurate)
+    {
+        var num,
+            unit,
+            which_place = places[inaccurate ? "inaccurate" : "accurate"];
+        
+        if (bytes < which_place [0]) {        /// bytes
+            num = bytes;
+            unit = "byte" + (bytes === 1 ? "" : "s");
+        } else if (bytes < which_place [1]) { /// kB
+            num = bytes / which_place [0];
+            unit = "kB";
+        } else if (bytes < which_place [2]) { /// MB
+            num = bytes / which_place [1];
+            unit = "MB";
+        } else if (bytes < which_place [3]) { /// GB
+            num = bytes / which_place [2];
+            unit = "GB";
+        } else if (bytes < which_place [4]) { /// TB
+            num = bytes / which_place [3];
+            unit = "TB";
+        } else if (bytes < which_place [5]) { /// PB
+            num = bytes / which_place [4];
+            unit = "PB";
+        } else {                              /// EB
+            num = bytes / which_place [5];
+            unit = "EB";
+        }
+        
+        return (Math.round(num * 100) / 100) + " " + unit;
+    };
+}());
+
+
+/**
+ * Download a file.
+ *
+ * @note Inspired by Carlosedp.
+ * @see  http://stackoverflow.com/questions/4771614/download-large-file-with-node-js-avoiding-high-memory-consumption
+ */
+function download_file(download_url, callback, options)
+{
+    var client,
+        filename,
+        host,
+        parsed_url = require("url").parse(download_url),
+        request;
+    
+    if (!options) {
+        options = {};
+    }
+    
+    host = parsed_url.hostname;
+    filename = options.save_as || parsed_url.pathname.split("/").pop();
+    
+    client = require("http").createClient(80, host);
+    
+    if (options.verbose) {
+        console.log("Downloading file: " + filename);
+    }
+    
+    request = client.request("GET", download_url, {"host": host});
+    request.end();
+    
+    request.addListener("response", function (response)
+    {
+        var amount_so_far = 0,
+            downloadfile = require("fs").createWriteStream(filename, {"flags": "a"}),
+            last_bytes_amt,
+            progress_int,
+            total = response.headers["content-length"];
+        
+        if (options.verbose && total) {
+            console.log("File size " + filename + ": " + total + " bytes.");
+        }
+    
+        if (options.progress) {
+            progress_int = setInterval(function ()
+            {
+                if (amount_so_far !== last_bytes_amt) {
+                    process.stdout.clearLine();
+                    process.stdout.cursorTo(0);
+                    process.stdout.write("Download progress: " + human_readable(amount_so_far))
+                    if (total) {
+                        process.stdout.write(" " + Math.round((amount_so_far / total) * 100) + "%")
+                    }
+                    last_bytes_amt = amount_so_far;
+                }
+            }, 1000);
+        }
+        
+        response.addListener("data", function (chunk)
+        {
+            amount_so_far += chunk.length;
+            downloadfile.write(chunk, {encoding:"binary"});
+        });
+        response.addListener("end", function()
+        {
+            downloadfile.end();
+            if (options.progress) {
+                clearInterval(progress_int);
+                process.stdout.write("\n");
+            }
+            if (options.verbose) {
+                console.log("Finished downloading " + filename);
+            }
+            if (callback) {
+                callback(filename);
+            }
+        });
+
+    });
+}
+
 exports.start = function (context)
 {
-    context.ask("Where are the CKJV files located?", "../languages/Chinese/", function (dir)
+    context.yes_no("Download from the internet?", "yes", function (download)
     {
-        var check_simp,
-            check_trad,
-            dir_simp = "/ckjv_shangdi_sc/script/",
-            dir_trad = "/ckjv_shangdi_tc/script/",
-            import_simp = true,
-            import_trad = true,
-            name_simp = "Simplified Chinese (简体中文)",
-            name_trad = "Traditional Chinese (繁體中文)",
-            lang_simp = "zh_s",
-            lang_trad = "zh_t",
-            word_len  = 255,
-            notes_len = 1;
-        
-        function get_simp()
-        {
-            if (import_simp) {
-                console.log("Importing " + name_simp + "...");
-                import_text(context, dir + dir_simp + "ckjv.js", name_simp, lang_simp, segment_simp, word_len, notes_len, get_trad);
-            } else {
-                get_trad();
-            }
-        }
-        
-        function get_trad()
-        {
-            if (import_trad) {
-                console.log("Importing " + name_trad + "...");
-                import_text(context, dir + dir_trad + "ckjv.js", name_trad, lang_trad, segment_trad, word_len, notes_len, context.done);
-            } else {
-                context.done();
-            }
-        }
-        
-        check_simp = function ()
-        {
-            context.does_bible_table_exist(lang_simp, function (exists)
+        if (download) {
+            context.ask("What is the Traditional Shangdi (上帝) URL?", "http://ckjv.asia/ckjv_shangdi_tc/script/ckjv.js", function (trad_turl)
             {
-                if (!exists) {
-                    check_trad();
-                } else {
-                    context.yes_no("Do you want to overwrite bible_" + lang_simp + "? ", function (overwrite)
+                var download_filename = "tmp_trad_ckjv_download_" + require("crypto").randomBytes(4).readUInt32LE(0);
+                download_file(trad_turl, function ()
+                {
+                    start_importaing(download_filename, context, function ()
                     {
-                        if (!overwrite) {
-                            import_simp = false;
-                        }
-                        check_trad();
-                    }, ["red", "bold"]);
-                }
+                        require("fs").unlinkSync(download_filename);
+                        context.done();
+                    })
+                }, {progress: true, save_as: download_filename});
             });
-        };
-        
-        check_trad = function ()
-        {
-            context.does_bible_table_exist(lang_trad, function (exists)
+        } else {
+            context.ask("Where is the Traditional Shangdi (上帝) file located?", "../languages/Chinese/ckjv_shangdi_tc/script/ckjv.js", function (trad_file)
             {
-                if (!exists) {
-                    get_simp();
-                } else {
-                    context.yes_no("Do you want to overwrite bible_" + lang_trad + "? ", function (overwrite)
-                    {
-                        if (!overwrite) {
-                            import_trad = false;
-                        }
-                        get_simp();
-                    }, ["red", "bold"]);
-                }
+                start_importaing(trad_file, context, function ()
+                {
+                    context.done();
+                });
             });
-        };
-        
-        /// Start by checking if the tables already exist.
-        check_simp();
+        }
     });
 };
