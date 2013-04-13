@@ -67,7 +67,7 @@ function create_table_structures(lang, callback)
 }
 
 
-function create_verses(lang)
+function create_verses(lang, force, callback)
 {
     /// Get the space symbol for that language (if any).
     var space = require(config.static_path + "js/lang/" + lang + ".js").BF.langs[lang];
@@ -208,7 +208,11 @@ function create_verses(lang)
                                     console.log(err);
                                     throw "Error adding verses";
                                 }
-                                done();
+                                if (callback) {
+                                    callback();
+                                } else {
+                                    done();
+                                }
                             });
                         });
                     } else {
@@ -221,7 +225,7 @@ function create_verses(lang)
     
     check_for_tables(function (html_exists, verses_exists)
     {
-        if (html_exists || verses_exists) {
+        if ((html_exists || verses_exists) && !force) {
             yes_no("Do you really want to overwrite the existing table(s)? ", function (overwrite)
             {
                 if (overwrite) {
@@ -234,14 +238,25 @@ function create_verses(lang)
     });
 }
 
-ask("Enter language:", "en", function (lang)
+function check_lang(lang, force, callback)
 {
     does_bible_table_exist(lang, function (exists)
     {
         if (exists) {
-            create_verses(lang);
+            create_verses(lang, force, callback);
         } else {
             console.warn("Sorry, the SQL data for \"" + lang + "\" does not exist.");
         }
     });
-});
+}
+
+/// Was this run directly?
+if (require.main === module) {
+    ask("Enter language:", "en", check_lang);
+} else {
+    exports.run = function (lang, callback)
+    {
+        /// Set force to TRUE so that it does not try to ask for input.
+        check_lang(lang, true, callback);
+    };
+}

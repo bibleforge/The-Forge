@@ -13,25 +13,25 @@ function run(dict, corpus, callback)
     var rand = "tmp-" + (new Date()).getTime() + "_" + Math.round(Math.random() * 100000) + "-";
     
     console.log("1/5 Weighing dictionary entries (this is the long part)...");
-    execFile("node", ["1-weigh.js", dict, corpus], function (err, res)
+    execFile("node", [__dirname + "/1-weigh.js", dict, corpus], function (err, res)
     {
         var weights_file = "./" + rand + "weights.js";
         fs.writeFileSync(weights_file, res);
         
         console.log("2/5 Filtering dictionary by weights...");
-        execFile("node", ["2-filter_by_weight.js", dict, weights_file], function (err, res)
+        execFile("node", [__dirname + "/2-filter_by_weight.js", dict, weights_file], function (err, res)
         {
             var filtered1_file = "./" + rand + "dict_filtered_by_weight.js"
             fs.writeFileSync(filtered1_file, res);
             
             console.log("3/5 Analyzing dictionary...");
-            execFile("node", ["3-analyze.js", filtered1_file], function (err, res)
+            execFile("node", [__dirname + "/3-analyze.js", filtered1_file], function (err, res)
             {
                 var analysis_file = "./" + rand + "analysis.js";
                 fs.writeFileSync(analysis_file, res);
                 
                 console.log("4/5 Filtering out unneeded entries...");
-                execFile("node", ["4-filter_by_analysis.js", filtered1_file, analysis_file], function (err, res)
+                execFile("node", [__dirname + "/4-filter_by_analysis.js", filtered1_file, analysis_file], function (err, res)
                 {
                     var filtered2_file = "./" + rand + "dict.js",
                         plot_data_file = "./" + rand + "plot_data.json";
@@ -39,7 +39,7 @@ function run(dict, corpus, callback)
                     fs.writeFileSync(filtered2_file, res);
                     
                     console.log("5/5 Weighing and converting to raw data...");
-                    execFile("node", ["5-sort_by_weight_and_convert.js", filtered2_file, weights_file, plot_data_file], function (err, res)
+                    execFile("node", [__dirname + "/5-sort_by_weight_and_convert.js", filtered2_file, weights_file, plot_data_file], function (err, res)
                     {
                         var raw_file = "./" + rand + "dict_raw";
                         fs.writeFileSync(raw_file, res);
@@ -63,16 +63,21 @@ function run(dict, corpus, callback)
     });
 }
 
-ask("Dictionaries location:", "./", function (dict)
-{
-    ask("CKJV location:", "../../../languages/Chinese/", function (corpus)
+/// Was this run directly?
+if (require.main === module) {
+    ask("Dictionaries location:", "./", function (dict)
     {
-        console.log("Getting Simplified Chinese:");
-        run(dict + "/dict_simp.js", corpus + "/ckjv_shangdi_sc/script/ckjv.js", function ()
+        ask("CKJV location:", "../../../languages/Chinese/", function (corpus)
         {
-            console.log("Getting Traditional Chinese:");
-            run(dict + "/dict_trad.js", corpus + "/ckjv_shangdi_tc/script/ckjv.js", done);
+            console.log("Getting Simplified Chinese:");
+            run(dict + "/dict_simp.js", corpus + "/ckjv_shangdi_sc/script/ckjv.js", function ()
+            {
+                console.log("Getting Traditional Chinese:");
+                run(dict + "/dict_trad.js", corpus + "/ckjv_shangdi_tc/script/ckjv.js", done);
+            });
+            
         });
-        
     });
-});
+} else {
+    exports.run = run;
+}

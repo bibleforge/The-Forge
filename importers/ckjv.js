@@ -1,7 +1,11 @@
 "use strict";
 
 ///NOTE: Since node reuses the same module, segment.js cannot be required twice.
-var download_file = require("../helpers/download.js").download,
+var auto_convert = require("../language_tools/chinese/0-auto_convert.js").run,
+    create_verse_tables = require("../create_verse_tables.js").run,
+    download_file = require("../helpers/download.js").download,
+    fs = require("fs"),
+    random_numbers = require("../helpers/random.js").random_numbers,
     segmentor = require("../language_tools/chinese/segment.js"),
     segment_simp,
     segment_trad;
@@ -224,6 +228,18 @@ function create_simplified_version(trad)
     return require("../language_tools/chinese/trad2simp.js").trad2simp(trad);
 }
 
+function run_auto_convert(type, text, callback)
+{
+    var tmpfile = process.cwd() + "/tmp_ckjv_" + type + "_" + random_numbers();
+    fs.writeFileSync(tmpfile, text);
+    
+    auto_convert(process.cwd() + "/language_tools/chinese/dict_" + type + ".js", tmpfile, function ()
+    {
+        fs.unlinkSync(tmpfile);
+        callback();
+    });
+}
+
 function start_importaing(trad_file, context, callback)
 {
     var check_simp,
@@ -236,13 +252,21 @@ function start_importaing(trad_file, context, callback)
         lang_trad = "zh_t",
         word_len  = 255,
         notes_len = 1,
-        trad_text = require("fs").readFileSync(trad_file, "utf8");
+        trad_text = fs.readFileSync(trad_file, "utf8");
     
     function get_simp()
     {
         if (import_simp) {
             console.log("Importing " + name_simp + "...");
-            import_text(context, create_simplified_version(trad_text), name_simp, lang_simp, segment_simp, word_len, notes_len, get_trad);
+            run_auto_convert("simp", create_simplified_version(trad_text), function ()
+            {
+                console.log("Importing into database...");
+                import_text(context, create_simplified_version(trad_text), name_simp, lang_simp, segment_simp, word_len, notes_len, function ()
+                {
+                    console.log("Creating verse tables...");
+                    create_verse_tables(lang_simp, get_trad);
+                });
+            });
         } else {
             get_trad();
         }
@@ -252,10 +276,21 @@ function start_importaing(trad_file, context, callback)
     {
         if (import_trad) {
             console.log("Importing " + name_trad + "...");
-            import_text(context, trad_text, name_trad, lang_trad, segment_trad, word_len, notes_len, context.done);
+            //import_text(context, trad_text, name_trad, lang_trad, segment_trad, word_len, notes_len, context.done);
+            run_auto_convert("trad", trad_text, function ()
+            {
+                console.log("Importing into database...");
+                import_text(context, trad_text, name_trad, lang_trad, segment_trad, word_len, notes_len, function ()
+                {
+                    console.log("Creating verse tables...");
+                    create_verse_tables(lang_trad, callback || context.done);
+                });
+            });
         } else {
             if (callback) {
                 callback();
+            } else {
+                context.done();
             }
         }
     }
@@ -307,12 +342,12 @@ exports.start = function (context)
         if (download) {
             context.ask("What is the Traditional Shangdi (上帝) URL?", "http://ckjv.asia/ckjv_shangdi_tc/script/ckjv.js", function (trad_turl)
             {
-                var download_filename = "tmp_trad_ckjv_download_" + require("crypto").randomBytes(4).readUInt32LE(0);
+                var download_filename = "tmp_trad_ckjv_download_" + random_numbers();
                 download_file(trad_turl, function ()
                 {
                     start_importaing(download_filename, context, function ()
                     {
-                        require("fs").unlinkSync(download_filename);
+                        fs.unlinkSync(download_filename);
                         context.done();
                     })
                 }, {progress: true, save_as: download_filename});
