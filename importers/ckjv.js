@@ -1,8 +1,10 @@
 "use strict";
 
 var auto_convert,
+    config = require("../config.js").config,
     create_verse_tables = require("../create_verse_tables.js").run,
     download_file = require("../helpers/download.js").download,
+    forge = require("../helpers/forge.js").forge,
     fs = require("fs"),
     language_dir = process.cwd() + "/language_tools/chinese/",
     random_numbers = require("../helpers/random.js").random_numbers;
@@ -229,35 +231,55 @@ function create_simplified_version(trad)
     return require(language_dir + "trad2simp.js").trad2simp(trad);
 }
 
-function run_auto_convert(type, text, callback)
+function run_auto_convert(type, lang, text, callback)
 {
     var tmpfile = process.cwd() + "/tmp_ckjv_" + type + "_" + random_numbers();
     fs.writeFileSync(tmpfile, text);
     
     auto_convert(language_dir + "dict_" + type + ".js", tmpfile, function (files)
     {
+        var static_path = process.cwd() + "/" + config.static_path,
+            code,
+            plot_data;
+        
         /// Remove temporary CKJV file.
         fs.unlinkSync(tmpfile);
         
-        /// Copy the analysis file to the Chinese language code section.
-        fs.unlinkSync(language_dir + "analysis_" + type + ".js");
-        copy_file(files.analysis_file, language_dir + "analysis_" + type + ".js");
+        /// Remove intermidate dictionary files.
+        fs.unlinkSync(files.filtered1_file);
+        fs.unlinkSync(files.filtered2_file);
         
-        /// Copy the weights file to the Chinese language code section.
+        ///NOTE: .slice(13) trims off "this." from the file.
+        forge(static_path + "/js/lang/" + lang + ".js", "Analysis", ["var " + fs.readFileSync(files.analysis_file, "utf8").trim().slice(5) + ","])
+        
+        /// Move the analysis file to the Chinese language code section.
+        fs.unlinkSync(language_dir + "analysis_" + type + ".js");
+        fs.rename(files.analysis_file, language_dir + "analysis_" + type + ".js");
+        
+        /// Move the weights file to the Chinese language code section.
         ///NOTE: This file is not currently used, but it code be useful since it takes a long time to generate.
         fs.unlinkSync(language_dir + "weights_" + type + ".js");
-        copy_file(files.weights_file, language_dir + "weights_" + type + ".js");
+        fs.rename(files.weights_file, language_dir + "weights_" + type + ".js");
         
         /// Copy the analysis file to the Chinese language code section.
         fs.unlinkSync(language_dir + "dict_raw_" + type);
         copy_file(files.raw_file, language_dir + "dict_raw_" + type);
         
-        console.log("********************");
-        console.log("New files generated:");
-        console.log("Do not forget to copy the dictionary file" + files.raw_file + ",");
-        console.log("integrate " + files.analysis_file + " file into the lang file for " + type + ",");
-        console.log("and integreate the plot data from " + files.plot_data_file + " into both the segmentors.");
-        console.log("********************");
+        /// Replace the dictionary in the code.
+        fs.unlinkSync(static_path + "/js/misc/" + lang + "_dict");
+        fs.rename(files.raw_file, static_path + "/js/misc/" + lang + "_dict");
+        
+        /// Merge in plot data.
+        plot_data = fs.readFileSync(files.plot_data_file, "utf8");
+        code = fs.readFileSync(static_path + "/js/misc/zh_segment.js", "utf8");
+        if (type === "trad") {
+            forge(static_path + "/js/misc/zh_segment.js", "Traditional Chinese Plot Data", ["p = " + plot_data + ";"]);
+            forge(language_dir + "segment.js",            "Traditional Chinese Plot Data", ["p = " + plot_data + ";"]);
+        } else {
+            forge(static_path + "/js/misc/zh_segment.js", "Simplified Chinese Plot Data", ["p = " + plot_data + ";"]);
+            forge(language_dir + "segment.js",            "Simplified Chinese Plot Data", ["p = " + plot_data + ";"]);
+        }
+        fs.unlinkSync(files.plot_data_file);
         
         callback();
     });
@@ -275,24 +297,55 @@ function start_importaing(trad_file, context, callback)
         lang_trad = "zh_t",
         word_len  = 255,
         notes_len = 1,
-        segmentor = require(language_dir + "segment.js"),
+        segmentor,
+        segment_simp,
+        segment_trad,
         trad_text = fs.readFileSync(trad_file, "utf8");
+    
+    function import_simp_into_db()
+    {
+        /// Create the segmentor after analyzing all of the data.
+        segmentor = require(language_dir + "segment.js");
+        
+        if (import_simp) {
+            segment_simp = segmentor.segment_init("./analysis_simp.js", language_dir + "dict_raw_simp");
+            
+            console.log("Importing " + name_simp + " into database...");
+            import_text(context, create_simplified_version(trad_text), name_simp, lang_simp, segment_simp, word_len, notes_len, function ()
+            {
+                console.log("Creating verse tables...");
+                create_verse_tables(lang_simp, import_trad_into_db);
+            });
+        } else {
+            import_trad_into_db();
+        }
+    }
+    
+    function import_trad_into_db()
+    {
+        if (import_trad) {
+            segment_trad = segmentor.segment_init("./analysis_trad.js", language_dir + "dict_raw_trad", true);
+            
+            console.log("Importing " + name_trad + " into database...");
+            import_text(context, trad_text, name_trad, lang_trad, segment_trad, word_len, notes_len, function ()
+            {
+                console.log("Creating verse tables...");
+                create_verse_tables(lang_trad, callback || context.done);
+            });
+        } else {
+            if (callback) {
+                callback();
+            } else {
+                context.done();
+            }
+        }
+    }
     
     function get_simp()
     {
         if (import_simp) {
-            console.log("Importing " + name_simp + "...");
-            run_auto_convert("simp", create_simplified_version(trad_text), function ()
-            {
-                var segment_simp = segmentor.segment_init("./analysis_simp.js", language_dir + "dict_raw_simp");
-                
-                console.log("Importing into database...");
-                import_text(context, create_simplified_version(trad_text), name_simp, lang_simp, segment_simp, word_len, notes_len, function ()
-                {
-                    console.log("Creating verse tables...");
-                    create_verse_tables(lang_simp, get_trad);
-                });
-            });
+            console.log("Preparing " + name_simp + "...");
+            run_auto_convert("simp", lang_simp, create_simplified_version(trad_text), get_trad);
         } else {
             get_trad();
         }
@@ -301,24 +354,10 @@ function start_importaing(trad_file, context, callback)
     function get_trad()
     {
         if (import_trad) {
-            console.log("Importing " + name_trad + "...");
-            run_auto_convert("trad", trad_text, function ()
-            {
-                segment_trad = segmentor.segment_init("./analysis_trad.js", language_dir + "dict_raw_trad", true);
-                
-                console.log("Importing into database...");
-                import_text(context, trad_text, name_trad, lang_trad, segment_trad, word_len, notes_len, function ()
-                {
-                    console.log("Creating verse tables...");
-                    create_verse_tables(lang_trad, callback || context.done);
-                });
-            });
+            console.log("Preparing " + name_trad + "...");
+            run_auto_convert("trad", lang_trad, trad_text, import_simp_into_db);
         } else {
-            if (callback) {
-                callback();
-            } else {
-                context.done();
-            }
+            import_simp_into_db();
         }
     }
     

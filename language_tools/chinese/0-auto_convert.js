@@ -22,6 +22,7 @@ function run(dict, corpus, callback)
         if (err) {
             throw err;
         }
+        
         fs.writeFileSync(weights_file, res);
         
         console.log("2/5 Filtering dictionary by weights...");
