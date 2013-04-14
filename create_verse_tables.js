@@ -70,7 +70,7 @@ function create_table_structures(lang, callback)
 function create_verses(lang, force, callback)
 {
     /// Get the space symbol for that language (if any).
-    var space = require(config.static_path + "js/lang/" + lang + ".js").BF.langs[lang];
+    var space = require(require("./config.js").config.static_path + "js/lang/" + lang + ".js").BF.langs[lang].space;
     
     function check_for_tables(callback)
     {
