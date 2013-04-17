@@ -6,6 +6,8 @@ function forge(file, key, lines)
         data = fs.readFileSync(file, "utf8"),
         find;
     
+    ///TODO: In retrospect, one liners should be treated the same (and have ending comments) since
+    ///      there is no way to know when a one liner used to have more lines.
     if (lines.length === 1) {
         find = new RegExp("(\n\\s*/// Created in the Forge)[^\n]*(\n\\s*/// " + key + "\n\\s*)[^\n]*");
         code = lines[0];
