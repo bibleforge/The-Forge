@@ -4,8 +4,7 @@
  * @date    05-15-12
  * @version alpha (α)
  * @link    http://BibleForge.com
- * @license GNU Affero General Public License 3.0 (AGPL-3.0)
- * @author  BibleForge <info@bibleforge.com>
+ * @license The MIT License (MIT)
  */
 
 "use strict";
@@ -17,5 +16,7 @@ this.config = {
         pass: "password",
         base: "bf"
     },
-    static_path: "../dev/client/"
+    static_path: "../dev/client/",
+    server_path: "../dev/server/",
+    http_server: "http://127.0.0.1:7071/",
 };
