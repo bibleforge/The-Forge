@@ -15,11 +15,8 @@ if (typeof trad2simp_map === "undefined" && typeof require !== "undefined") {
     {find: "甚麼", replace: "什么"},
     
     /// Preserve 乾
-    {find: "白乾兒", replace: "白乾儿"},
-    {find: "大便乾燥", replace: "大便乾燥"},
-    {find: "烘乾", replace: "烘乾"},
-    {find: "烘乾機", replace: "烘乾机"},
-    {find: "葡萄乾兒", replace: "葡萄乾儿"},
+    {find: "乾坤", replace: "乾坤"},
+    {find: "乾隆", replace: "乾隆"},
     /// Could also do 乾安 => 乾安 (a place in Jilin) and 乾縣 => 乾县 (a county in Shaanxi)
     
     /// Preserve 瞭
