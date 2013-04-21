@@ -250,46 +250,34 @@ function run_auto_convert(type, lang, text, callback)
     auto_convert(language_dir + "dict_" + type + ".js", tmpfile, function (files)
     {
         var static_path = process.cwd() + "/" + config.static_path,
-            code,
+            lang_file,
             plot_data;
         
-        /// Remove temporary CKJV file.
-        fs.unlinkSync(tmpfile);
+        lang_file = static_path + "/js/lang/" + lang + ".js";
         
-        /// Remove intermidate dictionary files.
-        fs.unlinkSync(files.filtered1_file);
-        fs.unlinkSync(files.filtered2_file);
-        
+        /// Update the analysis data.
         ///NOTE: .slice(13) trims off "this." from the file.
-        forge(static_path + "/js/lang/" + lang + ".js", "Analysis", ["var " + fs.readFileSync(files.analysis_file, "utf8").trim().slice(5) + ","])
-        
-        /// Move the analysis file to the Chinese language code section.
-        fs.unlinkSync(language_dir + "analysis_" + type + ".js");
-        fs.rename(files.analysis_file, language_dir + "analysis_" + type + ".js");
+        forge(lang_file, "Analysis", ["var " + fs.readFileSync(files.analysis_file, "utf8").trim().slice(5) + ","])
         
         /// Move the weights file to the Chinese language code section.
         ///NOTE: This file is not currently used, but it code be useful since it takes a long time to generate.
         fs.unlinkSync(language_dir + "weights_" + type + ".js");
         fs.rename(files.weights_file, language_dir + "weights_" + type + ".js");
         
-        /// Copy the analysis file to the Chinese language code section.
-        fs.unlinkSync(language_dir + "dict_raw_" + type);
-        copy_file(files.raw_file, language_dir + "dict_raw_" + type);
-        
-        /// Replace the dictionary in the code.
+        /// Replace the dictionary for the client.
         fs.unlinkSync(static_path + "/js/misc/" + lang + "_dict");
         fs.rename(files.raw_file, static_path + "/js/misc/" + lang + "_dict");
         
         /// Merge in plot data.
         plot_data = fs.readFileSync(files.plot_data_file, "utf8");
-        code = fs.readFileSync(static_path + "/js/misc/zh_segment.js", "utf8");
-        if (type === "trad") {
-            forge(static_path + "/js/misc/zh_segment.js", "Traditional Chinese Plot Data", ["p = " + plot_data + ";"]);
-            forge(language_dir + "segment.js",            "Traditional Chinese Plot Data", ["p = " + plot_data + ";"]);
-        } else {
-            forge(static_path + "/js/misc/zh_segment.js", "Simplified Chinese Plot Data", ["p = " + plot_data + ";"]);
-            forge(language_dir + "segment.js",            "Simplified Chinese Plot Data", ["p = " + plot_data + ";"]);
-        }
+        forge(lang_file, "Plot Data", ["plot_data = " + plot_data + ","]);
+        
+        /// Remove temporary CKJV file.
+        fs.unlinkSync(tmpfile);
+        /// Remove remaining intermidate and temporary files.
+        fs.unlinkSync(files.filtered1_file);
+        fs.unlinkSync(files.filtered2_file);
+        fs.unlinkSync(files.analysis_file);
         fs.unlinkSync(files.plot_data_file);
         
         callback();
@@ -311,15 +299,24 @@ function start_importaing(trad_file, context, callback)
         segmentor,
         segment_simp,
         segment_trad,
+        static_path = process.cwd() + "/" + config.static_path,
         trad_text = fs.readFileSync(trad_file, "utf8");
+    
+    segmentor = require(static_path + "/js/misc/zh_segment.js").segment;
     
     function import_simp_into_db()
     {
-        /// Create the segmentor after analyzing all of the data.
-        segmentor = require(language_dir + "segment.js");
+        var lang,
+            dict;
         
         if (import_simp) {
-            segment_simp = segmentor.segment_init("./analysis_simp.js", language_dir + "dict_raw_simp");
+            lang = require(static_path + "/js/lang/" + lang_simp + ".js").BF.langs[lang_simp];
+            dict = fs.readFileSync(static_path + "/js/misc/" + lang_simp + "_dict", "utf8");
+            
+            segment_simp = function (str)
+            {
+                return segmentor(lang.analysis, dict, lang.plot_data, str, true);
+            }
             
             console.log("Importing " + name_simp + " into database...");
             import_text(context, create_simplified_version(trad_text), name_simp, lang_simp, segment_simp, word_len, notes_len, function ()
@@ -334,8 +331,17 @@ function start_importaing(trad_file, context, callback)
     
     function import_trad_into_db()
     {
+        var lang,
+            dict;
+        
         if (import_trad) {
-            segment_trad = segmentor.segment_init("./analysis_trad.js", language_dir + "dict_raw_trad", true);
+            lang = require(static_path + "/js/lang/" + lang_trad + ".js").BF.langs[lang_trad];
+            dict = fs.readFileSync(static_path + "/js/misc/" + lang_trad + "_dict", "utf8");
+            
+            segment_trad = function (str)
+            {
+                return segmentor(lang.analysis, dict, lang.plot_data, str, true);
+            }
             
             console.log("Importing " + name_trad + " into database...");
             import_text(context, trad_text, name_trad, lang_trad, segment_trad, word_len, notes_len, function ()
