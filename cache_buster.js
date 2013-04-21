@@ -136,7 +136,7 @@ start_watching = (function ()
                 timeout = setTimeout(function ()
                 {
                     check_all(false, true);
-                }, 300);
+                }, 600);
             });
         }());
     };
