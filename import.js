@@ -92,6 +92,8 @@ function does_bible_table_exist(name, callback)
 function done()
 {
     process.stdout.write("\u0007");
+    ///NOTE: Since the database connection does not close, we need to stop the program manually.
+    process.exit();
 }
 
 ask    = asker.ask;
