@@ -190,6 +190,11 @@ function create_verses(lang, force, callback)
                     
                     data.forEach(function (datum)
                     {
+                        ///NOTE: Some connectors do not convert types to numbers.
+                        datum.divine    = Number(datum.divine);
+                        datum.red       = Number(datum.red);
+                        datum.implied   = Number(datum.implied);
+                        datum.paragraph = Number(datum.paragraph);
                         add_word(datum);
                     });
                     
