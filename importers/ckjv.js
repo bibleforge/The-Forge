@@ -233,7 +233,6 @@ function import_text(context, data_file, name, lang, segment, word_len, notes_le
                 });
             }(0));
         }(0));
-        
     });
 }
 
