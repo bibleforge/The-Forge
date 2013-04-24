@@ -6,6 +6,11 @@ function forge(file, key, lines)
         data = fs.readFileSync(file, "utf8"),
         find;
     
+    if (typeof lines === "string") {
+        lines = [lines];
+    }
+    
+    ///TODO: Make this find and replace all occurances.
     ///TODO: In retrospect, one liners should be treated the same (and have ending comments) since
     ///      there is no way to know when a one liner used to have more lines.
     if (lines.length === 1) {
