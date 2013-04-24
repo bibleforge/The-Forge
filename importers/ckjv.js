@@ -4,6 +4,7 @@ var auto_convert,
     config = require("../config.js").config,
     create_verse_tables = require("../create_verse_tables.js").run,
     download_file = require("../helpers/download.js").download,
+    execFile = require("child_process").execFile,
     forge = require("../helpers/forge.js").forge,
     fs = require("fs"),
     language_dir = process.cwd() + "/language_tools/chinese/",
@@ -309,19 +310,26 @@ function start_importaing(trad_file, context, callback)
             dict;
         
         if (import_simp) {
-            lang = require(static_path + "/js/lang/" + lang_simp + ".js").BF.langs[lang_simp];
-            dict = fs.readFileSync(static_path + "/js/misc/" + lang_simp + "_dict", "utf8");
-            
-            segment_simp = function (str)
+            execFile("node", [process.cwd() + "/find_beginning_of_nt.js", lang_simp], function (err, res)
             {
-                return segmentor(lang.analysis, dict, lang.plot_data, str, true);
-            }
-            
-            console.log("Importing " + name_simp + " into database...");
-            import_text(context, create_simplified_version(trad_text), name_simp, lang_simp, segment_simp, word_len, notes_len, function ()
-            {
-                console.log("Creating verse tables...");
-                create_verse_tables(lang_simp, import_trad_into_db);
+                if (err) {
+                    console.log(err);
+                }
+                
+                lang = require(static_path + "/js/lang/" + lang_simp + ".js").BF.langs[lang_simp];
+                dict = fs.readFileSync(static_path + "/js/misc/" + lang_simp + "_dict", "utf8");
+                
+                segment_simp = function (str)
+                {
+                    return segmentor(lang.analysis, dict, lang.plot_data, str, true);
+                }
+                
+                console.log("Importing " + name_simp + " into database...");
+                import_text(context, create_simplified_version(trad_text), name_simp, lang_simp, segment_simp, word_len, notes_len, function ()
+                {
+                    console.log("Creating verse tables...");
+                    create_verse_tables(lang_simp, import_trad_into_db);
+                });
             });
         } else {
             import_trad_into_db();
@@ -334,19 +342,26 @@ function start_importaing(trad_file, context, callback)
             dict;
         
         if (import_trad) {
-            lang = require(static_path + "/js/lang/" + lang_trad + ".js").BF.langs[lang_trad];
-            dict = fs.readFileSync(static_path + "/js/misc/" + lang_trad + "_dict", "utf8");
-            
-            segment_trad = function (str)
+            execFile("node", [process.cwd() + "/find_beginning_of_nt.js", lang_trad], function (err, res)
             {
-                return segmentor(lang.analysis, dict, lang.plot_data, str, true);
-            }
-            
-            console.log("Importing " + name_trad + " into database...");
-            import_text(context, trad_text, name_trad, lang_trad, segment_trad, word_len, notes_len, function ()
-            {
-                console.log("Creating verse tables...");
-                create_verse_tables(lang_trad, callback || context.done);
+                if (err) {
+                    console.log(err);
+                }
+                
+                lang = require(static_path + "/js/lang/" + lang_trad + ".js").BF.langs[lang_trad];
+                dict = fs.readFileSync(static_path + "/js/misc/" + lang_trad + "_dict", "utf8");
+                
+                segment_trad = function (str)
+                {
+                    return segmentor(lang.analysis, dict, lang.plot_data, str, true);
+                }
+                
+                console.log("Importing " + name_trad + " into database...");
+                import_text(context, trad_text, name_trad, lang_trad, segment_trad, word_len, notes_len, function ()
+                {
+                    console.log("Creating verse tables...");
+                    create_verse_tables(lang_trad, callback || context.done);
+                });
             });
         } else {
             if (callback) {
