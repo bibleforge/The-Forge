@@ -80,9 +80,27 @@ this.download = function (download_url, callback, options)
     {
         var amount_so_far = 0,
             downloadfile = require("fs").createWriteStream(filename, {"flags": "a"}),
+            done_timeout,
             last_bytes_amt,
             progress_int,
             total = response.headers["content-length"];
+        
+        function done()
+        {
+            downloadfile.end();
+            clearTimeout(done_timeout);
+            if (options.progress) {
+                clearInterval(progress_int);
+                process.stdout.clearLine();
+                process.stdout.cursorTo(0);
+            }
+            if (options.verbose) {
+                console.log("Finished downloading " + filename);
+            }
+            if (callback) {
+                callback(filename);
+            }
+        }
         
         if (options.verbose && total) {
             console.log("File size " + filename + ": " + total + " bytes.");
@@ -100,6 +118,11 @@ this.download = function (download_url, callback, options)
                     }
                     last_bytes_amt = amount_so_far;
                 }
+                
+                /// Is it done?
+                if (total && amount_so_far === total) {
+                    done();
+                }
             }, 1000);
         }
         
@@ -110,17 +133,11 @@ this.download = function (download_url, callback, options)
         });
         response.addListener("end", function()
         {
-            downloadfile.end();
-            if (options.progress) {
-                clearInterval(progress_int);
-                process.stdout.write("\n");
-            }
             if (options.verbose) {
-                console.log("Finished downloading " + filename);
+                console.log("Done");
             }
-            if (callback) {
-                callback(filename);
-            }
+            ///NOTE: The "end" event triggers before the data finishes saving.
+            done_timeout = setTimeout(done, 3000);
         });
 
     });
