@@ -12,6 +12,9 @@ if (process.argv.length === 2) {
     process.exit();
 }
 
+/// Make sure we can access the files properly.
+process.chdir(__dirname);
+
 config = require("./config.js").config;
 fs = require("fs");
 
