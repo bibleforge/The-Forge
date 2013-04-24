@@ -125,5 +125,6 @@ ask("Which text do you want to import? ", function (which)
         }
     } else {
         console.warn("Sorry, \"" + importer_file + "\" does not exist.");
+        done();
     }
 });
