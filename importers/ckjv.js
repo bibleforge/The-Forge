@@ -79,7 +79,7 @@ function get_data(data)
         .replace(/Ｈ/g, "H")
         .replace(/fromthe/g, "from the")
         /// new
-        .replace("<HY>有一代（generation）</HY>", "有一<HY>代（generation）</HY>")
+        .replace("<HY>有一代（generation）</HY>", "有一<HY>代（generation）</HY>") /// 箴30:13
         
         /// Simp
         .replace("<HY>愿他们的腰时常弯下（and bow down their back alway）。」", "<HY>愿他们的腰时常弯下（and bow down their back alway）</HY>。」")
@@ -99,9 +99,9 @@ function get_data(data)
         .replace("众女daughters）", "众女（daughters）") /// 结26:8
         .replace("<HY>已经（have）</HY> known", "<HY>已经（have known）</HY>认识") /// 约一2:14
         /// new
-        .replace("何曾听见呢？（whether there hath been any such thing as this great thing is, or hath been heard like it）</HY>？", "何曾听见呢（whether there hath been any such thing as this great thing is, or hath been heard like it）</HY>？")
-        .replace("还能存活呢？（Did ever people hear the voice of God speaking out of the midst of the fire, as thou hast heard, and live）</HY>？", "还能存活呢（Did ever people hear the voice of God speaking out of the midst of the fire, as thou hast heard, and live）</HY>？")
-        .replace("有念过吗？（And have ye not read this scripture）</HY>？", "有念过吗（And have ye not read this scripture）</HY>？")
+        .replace("何曾听见呢？（whether there hath been any such thing as this great thing is, or hath been heard like it）</HY>？", "何曾听见呢（whether there hath been any such thing as this great thing is, or hath been heard like it）</HY>？") /// 申4:32
+        .replace("还能存活呢？（Did ever people hear the voice of God speaking out of the midst of the fire, as thou hast heard, and live）</HY>？", "还能存活呢（Did ever people hear the voice of God speaking out of the midst of the fire, as thou hast heard, and live）</HY>？") ///申4:33
+        .replace("有念过吗？（And have ye not read this scripture）</HY>？", "有念过吗（And have ye not read this scripture）</HY>？") /// 可12:10
         
         /// Trad
         .replace("<HY>願他們的腰時常彎下（and bow down their back alway）。」", "<HY>願他們的腰時常彎下（and bow down their back alway）</HY>。」")
