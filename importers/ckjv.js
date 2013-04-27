@@ -78,6 +78,8 @@ function get_data(data)
     return JSON.parse(data
         .replace(/Ｈ/g, "H")
         .replace(/fromthe/g, "from the")
+        /// new
+        .replace("<HY>有一代（generation）</HY>", "有一<HY>代（generation）</HY>")
         
         /// Simp
         .replace("<HY>愿他们的腰时常弯下（and bow down their back alway）。」", "<HY>愿他们的腰时常弯下（and bow down their back alway）</HY>。」")
@@ -96,14 +98,18 @@ function get_data(data)
         .replace("<HY>正如经上所写的：「（as it is written）</HY>", "<HY>正如经上所写的：（as it is written）</HY>「")
         .replace("众女daughters）", "众女（daughters）") /// 结26:8
         .replace("<HY>已经（have）</HY> known", "<HY>已经（have known）</HY>认识") /// 约一2:14
+        /// new
+        .replace("何曾听见呢？（whether there hath been any such thing as this great thing is, or hath been heard like it）</HY>？", "何曾听见呢（whether there hath been any such thing as this great thing is, or hath been heard like it）</HY>？")
+        .replace("还能存活呢？（Did ever people hear the voice of God speaking out of the midst of the fire, as thou hast heard, and live）</HY>？", "还能存活呢（Did ever people hear the voice of God speaking out of the midst of the fire, as thou hast heard, and live）</HY>？")
+        .replace("有念过吗？（And have ye not read this scripture）</HY>？", "有念过吗（And have ye not read this scripture）</HY>？")
         
         /// Trad
-        .replace("<HY>願他們的腰時常彎下（and bow down their back alway）。」", "<HY>願他們的腰時常彎下（and bow down their back alway）</HY>。 」")
+        .replace("<HY>願他們的腰時常彎下（and bow down their back alway）。」", "<HY>願他們的腰時常彎下（and bow down their back alway）</HY>。」")
         .replace("滑土（slime）和瀝青（pitch）", "<HY>滑土（slime）</HY><HY>和瀝青（pitch）</HY>")
-        .replace("<HY>諸天之上（in the heavens）<HY></HY>，大地之下（in the earth）</HY>", "<HY>諸天之上（in the heavens ）</HY><HY>，大地之下（in the earth）</HY>")
+        .replace("<HY>諸天之上（in the heavens）<HY></HY>，大地之下（in the earth）</HY>", "<HY>諸天之上（in the heavens）</HY><HY>，大地之下（in the earth）</HY>")
         .replace("，厭惡（hate）", "，<HY>厭惡（hate）</HY>")
         .replace("　上帝（God）警戒（warned）", "<HY>　上帝（God）</HY><HY>警戒（warned）</HY>")
-        .replace("<HY>我們（our）<HY></HY>看為（think）</HY>", "<HY>我們（our）</HY><HY>看為（think）< /HY>")
+        .replace("<HY>我們（our）<HY></HY>看為（think）</HY>", "<HY>我們（our）</HY><HY>看為（think）</HY>")
         .replace("「看哪（Behold）", "「<HY>看哪（Behold）</HY>")
         .replace("可惡（wicked）", "<HY>可惡（wicked）</HY>")
         .replace("只走王的大道（king's high way）", "只走<HY>王的大道（king's high way）</HY>")
@@ -112,8 +118,12 @@ function get_data(data)
         .replace("。不料（behold），", "。<HY>不料（behold）</HY>，")
         .replace("<HY>並有一人必然來到（and one shall certainly come），並且氾濫經過（and overflow, and pass through）<HY>", "<HY>並有一人必然來到（and one shall certainly come）</HY>，<HY>並且氾濫經過（and overflow, and pass through）</HY>")
         .replace("<HY>正如經上所寫的：「（as it is written）</HY>", "<HY>正如經上所寫的：（as it is written）</HY>「")
-        .replace("眾女daughters）", "眾女（daughters）")
-        .replace("<HY>已經（have）</HY> known", "<HY>已經（have known）</HY>認識")
+        .replace("眾女daughters）", "眾女（daughters）") /// 结26:8
+        .replace("<HY>已經（have）</HY> known", "<HY>已經（have known）</HY>認識") /// 约一2:14
+        /// new
+        .replace("何曾聽見呢？（whether there hath been any such thing as this great thing is, or hath been heard like it）</HY>？", "何曾聽見呢（whether there hath been any such thing as this great thing is, or hath been heard like it）</HY>？")
+        .replace("還能存活呢？（Did ever people hear the voice of God speaking out of the midst of the fire, as thou hast heard, and live）</HY>？", "還能存活呢（Did ever people hear the voice of God speaking out of the midst of the fire, as thou hast heard, and live）</HY>？")
+        .replace("有念過嗎？（And have ye not read this scripture）</HY>？", "有念過嗎（And have ye not read this scripture）</HY>？")
         
         .replace(/(<HY>[^<]*<)[^/]/g, "$1/H")
         .replace(/.*profiles\s*=\s*new\s*Array\s*\(\s*/, "[").replace(/^\);$/m, "]").replace("loaded_ckjv = true;", "").trim());
