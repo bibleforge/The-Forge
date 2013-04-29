@@ -1,26 +1,37 @@
-var fs = require("fs");
+var created_str = "Created in the Forge",
+    fs = require("fs");
 
 function forge(file, key, lines)
 {
-    var code,
+    var code = "",
         data = fs.readFileSync(file, "utf8"),
-        find;
+        find,
+        spacing;
     
     if (typeof lines === "string") {
         lines = [lines];
     }
     
-    ///TODO: Make this find and replace all occurances.
-    ///TODO: In retrospect, one liners should be treated the same (and have ending comments) since
-    ///      there is no way to know when a one liner used to have more lines.
-    if (lines.length === 1) {
-        find = new RegExp("(\n\\s*/// Created in the Forge)[^\n]*(\n\\s*/// " + key + "\n\\s*)[^\n]*");
-        code = lines[0];
-    } else {
-        console.log("TODO: Need to find how much whitespace to add to each line.");
-        process.exit();
+    /// Find out how much spacing needs to be before each line.
+    spacing = data.match(new RegExp("([^\\S\\n]*?)/// Created in the Forge[^\\n]*\\n\\s*/// " + key + "\n"))[1];
+    
+    if (typeof spacing === "undefined") {
+        /// Make sure it found something.
+        return;
     }
-    fs.writeFileSync(file, data.replace(find, "$1 on " + (new Date()).toGMTString() + ".$2" + code));
+    
+    /// Add prefix.
+    code = spacing + "/// Created in the Forge on " + (new Date()).toGMTString() + ".\n" + spacing + "/// " + key + "\n";
+    
+    /// Add spacing to each line and combine.
+    lines.forEach(function (line)
+    {
+        code += spacing + line + "\n";
+    });
+    /// Add suffix.
+    code += spacing + "/// End of " + key + "\n";
+    
+    fs.writeFileSync(file, data.replace(new RegExp("[^\\S\\n]*?/// Created in the Forge[^\\n]*\\n\\s*/// " + key + "\n[\\s\\S]*/// End of " + key + "\n"), code));
 }
 
 exports.forge = forge;
