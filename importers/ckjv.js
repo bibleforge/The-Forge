@@ -275,8 +275,8 @@ function run_auto_convert(type, lang, text, callback)
         fs.rename(files.weights_file, language_dir + "weights_" + type + ".js");
         
         /// Replace the dictionary for the client.
-        fs.unlinkSync(static_path + "/js/misc/" + lang + "_dict");
-        fs.rename(files.raw_file, static_path + "/js/misc/" + lang + "_dict");
+        fs.unlinkSync(static_path + "/js/misc/" + lang + "_dict.txt");
+        fs.rename(files.raw_file, static_path + "/js/misc/" + lang + "_dict.txt");
         
         /// Merge in plot data.
         plot_data = fs.readFileSync(files.plot_data_file, "utf8");
@@ -327,7 +327,7 @@ function start_importaing(trad_file, context, callback)
                 }
                 
                 lang = require(static_path + "/js/lang/" + lang_simp + ".js").BF.langs[lang_simp];
-                dict = fs.readFileSync(static_path + "/js/misc/" + lang_simp + "_dict", "utf8");
+                dict = fs.readFileSync(static_path + "/js/misc/" + lang_simp + "_dict.txt", "utf8");
                 
                 segment_simp = function (str)
                 {
@@ -359,7 +359,7 @@ function start_importaing(trad_file, context, callback)
                 }
                 
                 lang = require(static_path + "/js/lang/" + lang_trad + ".js").BF.langs[lang_trad];
-                dict = fs.readFileSync(static_path + "/js/misc/" + lang_trad + "_dict", "utf8");
+                dict = fs.readFileSync(static_path + "/js/misc/" + lang_trad + "_dict.txt", "utf8");
                 
                 segment_trad = function (str)
                 {
