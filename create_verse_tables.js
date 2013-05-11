@@ -139,12 +139,12 @@ function create_verses(lang, force, callback)
                 phrase_verses = "";
             }
             
-            if (obj.word === "") {
-                return;
-            }
-            
             if (typeof obj.word !== "string") {
                 obj.word = obj.word.toString();
+            }
+            
+            if (obj.word === "") {
+                return;
             }
             
             phrase_html += "<a";
