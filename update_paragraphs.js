@@ -7,7 +7,8 @@ ask("Enter Language: (en) ", function (lang)
     var config,
         db,
         fs,
-        lang_obj;
+        lang_obj,
+        queries = [];
     
     if (!lang) {
         lang = "en";
@@ -36,7 +37,8 @@ ask("Enter Language: (en) ", function (lang)
             } else if (book !== -1 && /\d$/.test(el)) {
                 verseID = Number(lang_obj.determine_reference(book + " " + el.trim()));
                 if (verseID > 1) {
-                    db.query_sync("UPDATE `bible_" + lang + "` SET paragraph = (!paragraph) WHERE verseID = " + verseID + " ORDER BY id LIMIT 1");
+                    /// Store queries for later execution.
+                    queries[queries.length] = "UPDATE `bible_" + lang + "` SET paragraph = (!paragraph) WHERE verseID = " + verseID + " ORDER BY id LIMIT 1";
                 } else {
                     /// This was not a valid verse reference, so don't remove it.
                     new_file += el + "\n";
@@ -46,10 +48,20 @@ ask("Enter Language: (en) ", function (lang)
             }
         });
         
-        /// Backup old file.
-        fs.renameSync(filename, filename + "_" + Date.now())
-        /// Create new paragraph file.
-        fs.writeFileSync(filename, new_file, "utf8");
+        db.query_arr(queries, function (data, err)
+        {
+            if (err && err.length) {
+                console.log("ERROR");
+                console.log(err);
+                console.log("Something didn't work.");
+            } else {
+                /// Backup old file.
+                fs.renameSync(filename, filename + "_" + Date.now())
+                /// Create new paragraph file.
+                fs.writeFileSync(filename, new_file, "utf8");
+            }
+            process.exit();
+        });
     });
     
     /// Load the modules while the user is typing.
