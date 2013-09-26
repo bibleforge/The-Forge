@@ -72,9 +72,7 @@ this.yes_no = function (str, def, cb, style)
     {
         ans = String(ans).trim().toLowerCase();
         
-        ans = (ans === "y" || ans === "ye" || ans === "yes" || ans === "yeah" || ans === "yep" || ans === "1" || ans === "true");
-        
-        cb(ans);
+        cb((ans === "y" || ans === "yes" || ans === "yeah" || ans === "yep" || ans === "1" || ans === "true"));
     }, style);
 };
 

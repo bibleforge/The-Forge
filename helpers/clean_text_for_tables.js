@@ -1,4 +1,4 @@
-exports.clean = function (word, lang)
+exports.clean = function clean(word, lang)
 {
     if (lang === "en" || lang === "en_em") {
         /// Curly quotes.

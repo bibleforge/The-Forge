@@ -1,7 +1,7 @@
 var config = require("../config.js").config,
     db;
 
-db = require(process.cwd() + "/" + config.server_path + "./modules/db.js").db(config.db);
+db = require(process.cwd() + "/" + config.server_path + "/modules/db.js").db(config.db);
 
 this.db = {
     query: db.query,

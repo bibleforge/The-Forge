@@ -13,7 +13,7 @@ function forge(file, key, lines)
     }
     
     /// Find out how much spacing needs to be before each line.
-    spacing = data.match(new RegExp("([^\\S\\n]*?)/// Created in the Forge[^\\n]*\\n\\s*/// " + key + "\n"))[1];
+    spacing = data.match(new RegExp("([^\\S\\n]*?)/// " + created_str + "[^\\n]*\\n\\s*/// " + key + "\n"))[1];
     
     if (typeof spacing === "undefined") {
         /// Make sure it found something.
@@ -21,7 +21,7 @@ function forge(file, key, lines)
     }
     
     /// Add prefix.
-    code = spacing + "/// Created in the Forge on " + (new Date()).toGMTString() + ".\n" + spacing + "/// " + key + "\n";
+    code = spacing + "/// " + created_str + " on " + (new Date()).toGMTString() + ".\n" + spacing + "/// " + key + "\n";
     
     /// Add spacing to each line and combine.
     lines.forEach(function (line)
@@ -31,7 +31,7 @@ function forge(file, key, lines)
     /// Add suffix.
     code += spacing + "/// End of " + key + "\n";
     
-    fs.writeFileSync(file, data.replace(new RegExp("[^\\S\\n]*?/// Created in the Forge[^\\n]*\\n\\s*/// " + key + "\n[\\s\\S]*/// End of " + key + "\n"), code));
+    fs.writeFileSync(file, data.replace(new RegExp("[^\\S\\n]*?/// " + created_str + "[^\\n]*\\n\\s*/// " + key + "\n[\\s\\S]*/// End of " + key + "\n"), code));
 }
 
 exports.forge = forge;
