@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <title></title>
+        <meta charset=utf-8>
+    <style></style>
+  </head>
+  <body><svg xmlns="http://www.w3.org/2000/svg" id=capturesvg></svg><canvas id=capture></canvas><div id="done"></div></body>
+  <script src="wordcloud2.js"></script>
+  <script>
+    function create_word_cloud(options)
+    {
+      var canvas = document.getElementById("capturesvg"),
+          ctx;
+      
+      canvas.setAttribute("width", options.width + "px");
+      canvas.setAttribute("height", options.width + "px");
+      if (canvas.tagName.toLowerCase() === "canvas") {
+          ctx = canvas.getContext("2d");
+          ctx.rect(0,0,dim,dim);
+          ctx.fillStyle=options.backgroundColor;
+          ctx.fill();
+      }
+  
+      WordCloud(canvas, options);
+      //WordCloud(document.getElementById("capturesvg"), options);
+      canvas.addEventListener("wordcloudstop", function ()
+      {
+          var data;
+          if (canvas.outerHTML) {
+              data = canvas.outerHTML;
+          } else {
+              data = new XMLSerializer().serializeToString(canvas)
+          }
+          document.getElementById("done").textContent = data;
+          /*
+          setTimeout(function ()
+          {
+              //WordCloud(canvas, options);
+          }, 500);
+          if (canvas.tagName.toLowerCase() === "svg") {
+            capture.setAttribute("width", dim + "px");
+            capture.setAttribute("height", dim + "px");
+            var DOMURL = self.URL || self.webkitURL || self;
+            var img = new Image();
+            var blob = new Blob([data], {type: "image/svg+xml;charset=utf-8"});
+            var url = DOMURL.createObjectURL(blob);
+            img.src = url;
+            img.onload = function () {
+                document.getElementById("capture").getContext("2d").drawImage(img, 0,0)
+                DOMURL.revokeObjectURL(url);
+                console.log(document.getElementById("capture").getContext("2d").getImageData(0, 0, dim, dim).data)
+            };
+          }
+          */
+      });
+    }
+    
+      ajax = new window.XMLHttpRequest();
+      onload = function() {
+        create_word_cloud(eval("(" + ajax.responseText + ")"))
+      }
+      ajax.open("GET", "data.json");
+      ajax.send();
+  
+  </script>
+</html>
