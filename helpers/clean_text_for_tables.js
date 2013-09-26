@@ -11,3 +11,14 @@ exports.clean = function clean(word, lang)
     
     return word;
 }
+
+exports.remove_punc = function remove_punc(word, lang)
+{
+    if (lang === "en" || lang === "en_em") {
+        word = word.replace(/[.,;:?!—)(\[\]]|'\b/g, "");
+    } else if (lang === "zh_s" || lang === "zh_t") {
+        word = word.replace(/[…，。：？！；（）［］｛｝「」『』、丶]/g, "");
+    }
+    
+    return word;
+}
