@@ -177,12 +177,12 @@ start_watching(config.server_path + "index_non-js.html", /((?:src|href)=")([^"]+
 /// main.js (secondary.js & night.css)
 start_watching(config.static_path + "js/main.js", /(BF\.include\(\"|link_tag\.href\s*=\s*")(\/js\/secondary\.js|\/styles\/night\.css)(?:\?([\da-f]*))?/);
 /// main.js (extra languages)
-start_watching(config.static_path + "js/main.js", /([a-zA-Z0-9_]+)(\s*=\s*\{\n.*\n\s*hash:\s*)([\da-f]+)/, function (match)
+start_watching(config.static_path + "js/main.js", /([a-zA-Z0-9_]+)(\s*=\s*\{\n.*\n\s*hash:\s*")([\da-f]+)/, function (match)
 {
     return {
         file_to_watch:   config.static_path + "js/lang/" + match[1] + ".js",
         last_hash:       match[3] || 0,
-        replace_regex:   new RegExp("(" + match[1] + "\\s*=\\s*\{\n.*\n\\s*hash:\\s*)[\\da-f]+"),
+        replace_regex:   new RegExp("(" + match[1] + "\\s*=\\s*\{\n.*\n\\s*hash:\\s*\")[\\da-f]+"),
         replace_str_pre: "$1"
     };
 });
@@ -191,12 +191,12 @@ fs.readdirSync(config.static_path + "styles/lang/").forEach(function (filename)
 {
     var path = require("path");
     
-    start_watching(config.static_path + "js/lang/" + path.basename(filename, path.extname(filename)) + ".js", /^\s*css_hash:\s*([\da-f]+)/m, function (match)
+    start_watching(config.static_path + "js/lang/" + path.basename(filename, path.extname(filename)) + ".js", /^\s*css_hash:\s*"([\da-f]+)/m, function (match)
     {
         return {
             file_to_watch:   config.static_path + "styles/lang/" + filename,
             last_hash:       match[1] || 0,
-            replace_regex:   /^(\s*css_hash:\s*)[\da-f]+/m,
+            replace_regex:   /^(\s*css_hash:\s*")[\da-f]+/m,
             replace_str_pre: "$1"
         };
     });
