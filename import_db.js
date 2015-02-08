@@ -2,7 +2,8 @@
 
 var ask    = require("./helpers/ask.js").ask,
     db     = require("./helpers/db.js").db,
-    fs     = require("fs");
+    fs     = require("fs"),
+    zlib   = require("zlib");
 
 function done()
 {
@@ -266,16 +267,35 @@ function is_gz(path, callback)
     });
 }
 
+function stream_gzip(path)
+{
+    var in_stream = fs.createReadStream(path),
+        pipe = {on: function (command, func)
+        {
+            console.log(command);
+            if (command === "drain") {
+            //    func();
+            }
+            //console.log(arguments);
+            //console.log(unpipe);
+            //done();
+        }};
+    
+    //in_stream.pipe(zlib.createGunzip()).pipe(pipe);
+    console.log(typeof in_stream.pipe(zlib.createGunzip()));
+}
+
 function import_file(path, callback)
 {
     is_gz(path, function next(compressed)
     {
         if (compressed) {
-            console.log(path, "yes");
+            //console.log(path, "yes");
+            stream_gzip(path)
         } else {
-            console.log(path, "no");
+            //console.log(path, "no");
         }
-        callback();
+        //callback();
     });
 }
 
