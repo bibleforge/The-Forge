@@ -37,6 +37,9 @@ function get_text(book, chapter, callback)
             }
             
             db.query("SELECT part_of_speech FROM `bible_" + lang.replace(/[`'"]/g, "") + "` WHERE book = " + parseInt("2", 10) + " AND chapter = " + parseInt("32", 10) + " AND word != \"\"", function (data)
+            {
+                console.log(data);
+            });
         }(0));
     });
 }
@@ -79,6 +82,7 @@ if (process.argv[2]) {
 } else {
     ask("Enter language: ", function (res)
     {
+        lang = res;
         lang_obj = include_lang(lang);
         lang = res;
         book_loop(1);
