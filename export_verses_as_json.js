@@ -1,10 +1,11 @@
 "use strict";
 
-var ask    = require("./helpers/ask.js").ask,
-    db     = require("./helpers/db.js").db,
-    yes_no = require("./helpers/ask.js").yes_no,
-    clean  = require("./helpers/clean_text_for_tables.js").clean,
-    fs     = require("fs");
+var ask = require("./helpers/ask.js").ask;
+var yes_no = require("./helpers/ask.js").yes_no;
+var fs = require("fs");
+var p = require("path");
+var execFileSync = require("child_process").execFileSync;
+var zeros = ["", "00", "0", ""];
 
 function done()
 {
@@ -13,60 +14,9 @@ function done()
     process.exit();
 }
 
-function does_bible_table_exist(name, callback)
+function does_bible_table_exist(lang)
 {
-    db.query("SHOW TABLES LIKE 'bible_" + name.replace(/'/g, "\\'") + "'", function (res)
-    {
-        callback(res.length > 0);
-    });
-}
-
-function create_table_structures(lang, callback)
-{
-    var sql = [];
-    
-    /// Drop HTML
-    sql[sql.length] = "DROP TABLE IF EXISTS `bible_" + lang + "_html`";
-    
-    /// Create HTML
-    sql[sql.length]      = "CREATE TABLE `bible_" + lang + "_html` (";
-    sql[sql.length - 1] += "`id2` mediumint(3) unsigned NOT NULL AUTO_INCREMENT,";
-    sql[sql.length - 1] += "`id` int(4) unsigned NOT NULL,";
-    sql[sql.length - 1] += "`book` tinyint(1) unsigned NOT NULL DEFAULT '0',";
-    sql[sql.length - 1] += "`chapter` tinyint(1) unsigned NOT NULL DEFAULT '0',";
-    sql[sql.length - 1] += "`verse` tinyint(1) unsigned NOT NULL DEFAULT '0',";
-    sql[sql.length - 1] += "`words` text NOT NULL,";
-    sql[sql.length - 1] += "`paragraph` tinyint(1) unsigned NOT NULL,";
-    sql[sql.length - 1] += "PRIMARY KEY (`id2`),";
-    sql[sql.length - 1] += "KEY `verseID` (`id`),";
-    sql[sql.length - 1] += "KEY `book` (`book`)";
-    sql[sql.length - 1] += ") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
-    
-    /// Drop Verses
-    sql[sql.length] = "DROP TABLE IF EXISTS `bible_" + lang + "_verses`";
-    
-    /// Create Verses
-    sql[sql.length]      = "CREATE TABLE `bible_" + lang + "_verses` (";
-    sql[sql.length - 1] += "`id2` mediumint(3) unsigned NOT NULL AUTO_INCREMENT,";
-    sql[sql.length - 1] += "`id` int(4) unsigned NOT NULL,";
-    sql[sql.length - 1] += "`book` tinyint(1) unsigned NOT NULL DEFAULT '0',";
-    sql[sql.length - 1] += "`chapter` tinyint(1) unsigned NOT NULL DEFAULT '0',";
-    sql[sql.length - 1] += "`verse` tinyint(1) unsigned NOT NULL DEFAULT '0',";
-    sql[sql.length - 1] += "`words` text NOT NULL,";
-    sql[sql.length - 1] += "PRIMARY KEY (`id2`),";
-    sql[sql.length - 1] += "KEY `verseID` (`id`),";
-    sql[sql.length - 1] += "KEY `book` (`book`),";
-    sql[sql.length - 1] += "FULLTEXT KEY `words` (`words`)";
-    sql[sql.length - 1] += ") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
-    
-    db.query_arr(sql, function (data, err)
-    {
-        if (err.length) {
-            console.log(err);
-            throw "Error creating tables";
-        }
-        callback();
-    });
+    return fs.existsSync(p.join(__dirname, "..", "db", "bible_" + lang + "_all.sql.gz"));
 }
 
 function hardcode(str)
@@ -126,7 +76,7 @@ function expand_styles(str)
 }
 
 
-function export_verses(lang, type, callback)
+function export_verses_old(lang, type, callback)
 {
     var sql_base,
         sql_plain = "SELECT `bible_" + lang + "_html`.id, `bible_" + lang + "_verses`.words, `bible_" + lang + "_html`.paragraph FROM  `bible_" + lang + "_html` , `bible_" + lang + "_verses` WHERE `bible_" + lang + "_html`.id = `bible_" + lang + "_verses`.id",
@@ -191,35 +141,108 @@ function export_verses(lang, type, callback)
     }(0, 5000));
 }
 
+function getVerseID(b, c, v)
+{
+    return b + zeros[String(c).length] + c + zeros[String(v).length] + v;
+}
+
+function export_verses(lang, type, cb)
+{
+    var gzipPath = p.join(__dirname, "..", "db", "bible_" + lang + "_all.sql.gz");
+    var sql = execFileSync("gzip", ["-d", "-c", gzipPath], {encoding: "utf8"});
+    var table;
+    var inserts;
+    var json = "{";
+    
+    /*
+    if (type === 1) {
+        table = "html";
+    } else {
+        table = "html";
+    }
+    */
+    table = "html";
+    
+    inserts = sql.match(new RegExp("INSERT INTO `bible_" + lang + "_" + table + "` VALUES ([^\\n]+);", "g"))
+    
+    if (!inserts) {
+        throw new Error("Cannot parse lines");
+    }
+    
+    inserts.forEach(function oneach(insert)
+    {
+        var rows = insert.match(/\((\d+),(\d+),(\d+),(\d+),(\d+),'(.*?)',(\d+)\)/g);
+        rows.forEach(function oneach(rowStr)
+        {
+            var row = rowStr.match(/\((\d+),(\d+),(\d+),(\d+),(\d+),'(.*?)',(\d+)\)/);
+            var data = {
+                id2: row[1],
+                id: row[2],
+                book: row[3],
+                chapter: row[4],
+                verse: row[5],
+                words: row[6],
+                paragraph: row[7],
+            };
+            if (data.book != 1 || data.chapter != 1 || data.verse != 1) {
+                json += ",\n";
+            }
+            
+            if (type === 3) {
+                data.words = hardcode(data.words);
+            } else if (type === 4) {
+                data.words = expand_styles(data.words);
+            }
+            
+            json += "\"" + getVerseID(data.book, data.chapter, data.verse) + "\":" + JSON.stringify({
+                p: data.paragraph,
+                t: data.words
+            });
+            
+        });
+    });
+    
+    json += "}";
+    
+    fs.writeFileSync(lang + ".json", json);
+    
+    cb();
+}
+
 function check_lang(lang)
 {
-    does_bible_table_exist(lang, function (exists)
-    {
-        if (exists) {
-            console.log("Which type?");
-            console.log("(1) Plain text");
-            console.log("(2) HTML");
-            console.log("(3) HTML with hardcoded styles");
-            console.log("(4) HTML with expanded class names");
-            ask("Type :", 1, function (type)
-            {
-                type = parseInt(type);
-                if (type !== 1 && type !== 2 && type !== 3 && type !== 4) {
-                    console.error("Bad type");
-                    process.exit();
-                }
-                export_verses(lang, type)
-            });
-        } else {
-            console.error("Sorry, the SQL data for \"" + lang + "\" does not exist.");
-            process.exit();
-        }
-    });
+    if (does_bible_table_exist(lang)) {
+        console.log("Which type?");
+        console.log("(1) Plain text");
+        console.log("(2) HTML");
+        console.log("(3) HTML with hardcoded styles");
+        console.log("(4) HTML with expanded class names");
+        ask("Type :", 1, function (type)
+        {
+            type = parseInt(type);
+            if (type !== 1 && type !== 2 && type !== 3 && type !== 4) {
+                console.error("Bad type");
+                process.exit();
+            }
+            export_verses(lang, type)
+        });
+    } else {
+        console.error("Sorry, the SQL data for \"" + lang + "\" does not exist.");
+        process.exit(1);
+    }
 }
 
 /// Was this run directly?
 if (require.main === module) {
-    ask("Enter language:", "en", check_lang);
+    if (process.argv[2] && does_bible_table_exist(process.argv[2])) {
+        if (process.argv[3] && process.argv[3] >= 1 && process.argv[3] <= 4) {
+            export_verses(process.argv[2], Number(process.argv[3]), done)
+        } else {
+            check_lang(process.argv[2]);
+        }
+    } else {
+        ask("Enter language:", "en", check_lang);
+    }
 } else {
     exports.run = export_verses;
 }
