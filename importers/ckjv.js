@@ -124,6 +124,7 @@ function get_data(data)
         .replace("何曾聽見呢？（whether there hath been any such thing as this great thing is, or hath been heard like it）</HY>？", "何曾聽見呢（whether there hath been any such thing as this great thing is, or hath been heard like it）</HY>？")
         .replace("還能存活呢？（Did ever people hear the voice of God speaking out of the midst of the fire, as thou hast heard, and live）</HY>？", "還能存活呢（Did ever people hear the voice of God speaking out of the midst of the fire, as thou hast heard, and live）</HY>？")
         .replace("有念過嗎？（And have ye not read this scripture）</HY>？", "有念過嗎（And have ye not read this scripture）</HY>？")
+        .replace("遍察全地/HY>", "遍察全地")
         
         .replace(/(<HY>[^<]*<)[^/]/g, "$1/H")
         .replace(/.*profiles\s*=\s*new\s*Array\s*\(\s*/, "[").replace(/^\);$/m, "]").replace("loaded_ckjv = true;", "").trim());
