@@ -195,7 +195,7 @@ function export_verses(lang, type, cb)
             }
             
             json += "\"" + getVerseID(data.book, data.chapter, data.verse) + "\":" + JSON.stringify({
-                p: data.paragraph,
+                p: Number(data.paragraph),
                 t: data.words
             });
             
